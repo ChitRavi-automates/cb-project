@@ -1,0 +1,25 @@
+# Terraform local files - do NOT commit secrets
+terraform.tfvars
+*.tfvars
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+# kubeconfig/artifacts
+kubeconfig
+kubeconfig.b64
+pub-cert.pem
+# sealed secrets local artifacts
+*.sealed.yaml
+# Terraform state & backups
+IaC/terraform.tfstate
+IaC/terraform.tfstate.*
+IaC/tfplan*
+IaC/tfstate.backup*
+# kube configs
+.kube/
+kubeconfig
+kubeconfig.bak
+# temp
+*.log
+*.bak

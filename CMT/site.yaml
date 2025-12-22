@@ -1,0 +1,242 @@
+# (edited) idempotent site.yaml - writes env file before running installer so installs use private node IPs & correct token
+- name: Ensure host prerequisites (all hosts)
+  hosts: all
+  become: true
+  gather_facts: yes
+  tasks:
+    - name: Wait for package manager (Debian/Ubuntu) to be available
+      apt:
+        update_cache: yes
+      register: _apt
+      until: _apt is succeeded
+      retries: 6
+      delay: 5
+
+    - name: Install required OS packages
+      apt:
+        name:
+          - curl
+          - ca-certificates
+          - jq
+          - gnupg
+          - apt-transport-https
+          - netcat-openbsd
+        state: present
+        update_cache: yes
+
+    - name: Ensure /usr/local/bin exists
+      file:
+        path: /usr/local/bin
+        state: directory
+        mode: '0755'
+
+- name: Install k3s server on bootstrap (idempotent)
+  hosts: control_bootstrap
+  become: true
+  gather_facts: yes
+  vars:
+    install_check_path: /usr/local/bin/k3s
+  tasks:
+    - name: Install k3s server on bootstrap if missing
+      shell: >
+        INSTALL_K3S_VERSION={{ k3s_version }}
+        curl -sfL https://get.k3s.io | sh -s - server {{ '--cluster-init' if cluster_init | default(false) else '' }} --node-name {{ inventory_hostname }}
+      args:
+        creates: "{{ install_check_path }}"
+
+    - name: Ensure k3s service is active on bootstrap
+      include_tasks: tasks/ensure_k3s_service.yml
+
+    - name: Wait for server kubeconfig to appear
+      stat:
+        path: /etc/rancher/k3s/k3s.yaml
+      register: kubeconfig_stat
+      retries: 30
+      delay: 3
+      until: kubeconfig_stat.stat.exists
+
+- name: Expose k3s join token for the play run (from extra-var or by reading bootstrap)
+  hosts: control_bootstrap
+  become: true
+  gather_facts: no
+  tasks:
+    - name: Add bootstrap_vars host if k3s_token provided as extra-var
+      add_host:
+        name: bootstrap_vars
+        groups: k3s_vars
+        k3s_token: "{{ k3s_token }}"
+      when: (k3s_token is defined) and (k3s_token | length) > 0
+      run_once: true
+
+    - name: Read the k3s node-token from disk (only when not provided via extra-vars)
+      slurp:
+        src: /var/lib/rancher/k3s/server/node-token
+      register: node_token_b64
+      when: k3s_token is not defined or (k3s_token | length) == 0
+      failed_when: node_token_b64 is failed
+
+    - name: Add helper host with k3s_token from bootstrap file if not provided externally
+      add_host:
+        name: bootstrap_vars
+        groups: k3s_vars
+        k3s_token: "{{ node_token_b64.content | b64decode | trim }}"
+      when: k3s_token is not defined or (k3s_token | length) == 0
+      run_once: true
+
+- name: Join additional control plane nodes
+  hosts: controls
+  become: true
+  gather_facts: yes
+  vars:
+    install_check_path: /usr/local/bin/k3s
+  tasks:
+    - name: Fail if k3s_token was not retrieved from either bootstrap_vars or extra-var
+      fail:
+        msg: "k3s_token was not found. Provide it via --extra-vars k3s_token=... or ensure it exists on the bootstrap server."
+      when: >
+        ( (hostvars['bootstrap_vars'].k3s_token is not defined or (hostvars['bootstrap_vars'].k3s_token | length) == 0)
+          and
+          (k3s_token is not defined or (k3s_token | length) == 0)
+        )
+
+    - name: Build k3s env file on the node (ensures K3S_URL & token & node-ip are present)
+      copy:
+        dest: /tmp/k3s.service.env
+        owner: root
+        mode: '0600'
+        content: |
+          K3S_URL="{{ k3s_url }}"
+          K3S_TOKEN="{{ hostvars['bootstrap_vars'].k3s_token | default(k3s_token) }}"
+          K3S_NODE_IP="{{ ansible_default_ipv4.address }}"
+
+    - name: Move env into place and install k3s server if missing
+      shell: |
+        sudo mv /tmp/k3s.service.env /etc/systemd/system/k3s.service.env
+        sudo chown root:root /etc/systemd/system/k3s.service.env
+        sudo chmod 600 /etc/systemd/system/k3s.service.env
+        # install only if k3s isn't present
+        if [ ! -x /usr/local/bin/k3s ]; then
+          INSTALL_K3S_VERSION={{ k3s_version }} curl -sfL https://get.k3s.io | sh -s - server --node-name {{ inventory_hostname }}
+        fi
+      args:
+        creates: "{{ install_check_path }}"
+
+    - name: Ensure k3s service is active on this control
+      include_tasks: tasks/ensure_k3s_service.yml
+
+- name: Join worker nodes (agents)
+  hosts: workers
+  become: true
+  gather_facts: yes
+  vars:
+    install_check_path: "/usr/local/bin/k3s"
+  tasks:
+    - name: Fail if k3s_token was not retrieved from either bootstrap_vars or extra-var
+      fail:
+        msg: "k3s_token was not found. Provide it via --extra-vars k3s_token=... or ensure it exists on the bootstrap server."
+      when: >
+        ( (hostvars['bootstrap_vars'].k3s_token is not defined or (hostvars['bootstrap_vars'].k3s_token | length) == 0)
+          and
+          (k3s_token is not defined or (k3s_token | length) == 0)
+        )
+
+    - name: Build k3s agent env file on the node
+      copy:
+        dest: /tmp/k3s.service.env
+        owner: root
+        mode: '0600'
+        content: |
+          K3S_URL="{{ k3s_url }}"
+          K3S_TOKEN="{{ hostvars['bootstrap_vars'].k3s_token | default(k3s_token) }}"
+          K3S_NODE_IP="{{ ansible_default_ipv4.address }}"
+
+    - name: Move env into place and install k3s agent if missing
+      shell: |
+        sudo mv /tmp/k3s.service.env /etc/systemd/system/k3s.service.env
+        sudo chown root:root /etc/systemd/system/k3s.service.env
+        sudo chmod 600 /etc/systemd/system/k3s.service.env
+        if [ ! -x /usr/local/bin/k3s ]; then
+          INSTALL_K3S_VERSION={{ k3s_version }} curl -sfL https://get.k3s.io | sh -s -
+        fi
+      args:
+        creates: /usr/local/bin/k3s
+
+    - name: Ensure k3s-agent service is active on this worker
+      include_tasks: tasks/ensure_k3s_service.yml
+
+- name: Wait until expected number of nodes are Ready and taint control planes
+  hosts: control_bootstrap
+  become: true
+  gather_facts: no
+  vars:
+    kubeconfig_path: /etc/rancher/k3s/k3s.yaml
+  tasks:
+    - name: Wait for kubeconfig file to exist on bootstrap
+      stat:
+        path: "{{ kubeconfig_path }}"
+      register: kubeconfig_stat
+      retries: 30
+      delay: 3
+      until: kubeconfig_stat.stat.exists
+
+    - name: Wait until expected_nodes are Ready
+      shell: >
+        KUBECONFIG={{ kubeconfig_path }} kubectl get nodes --no-headers -o custom-columns=NAME:.metadata.name,STATUS:.status.conditions[-1].type \
+        | awk '/Ready/ {count++} END {print count+0}'
+      register: ready_count
+      retries: "{{ node_ready_retries }}"
+      delay: "{{ node_ready_delay }}"
+      until: (ready_count.stdout | int) >= (expected_nodes | int)
+
+    - name: Show nodes
+      shell: KUBECONFIG={{ kubeconfig_path }} kubectl get nodes -o wide
+      register: nodes_output
+
+    - name: Display nodes
+      debug:
+        var: nodes_output.stdout_lines
+
+    - name: Taint control-plane nodes with NoSchedule (if requested)
+      when: taint_control_nodes | bool
+      shell: |
+        KUBECONFIG={{ kubeconfig_path }} bash -c "for n in $(kubectl get nodes -o jsonpath='{range .items[?(@.metadata.labels.node-role\\.kubernetes\\.io/control-plane)]}{.metadata.name} {end}'); do KUBECONFIG={{ kubeconfig_path }} kubectl taint node $n node-role.kubernetes.io/control-plane=:NoSchedule --overwrite || true; done"
+      register: taints
+
+    - debug:
+        var: taints.stdout_lines
+
+- name: Deploy cluster addons (cert-manager, ArgoCD placeholders)
+  hosts: control_bootstrap
+  become: true
+  gather_facts: no
+  vars:
+    kubeconfig_path: /etc/rancher/k3s/k3s.yaml
+  tasks:
+    - name: Ensure kubectl access via kubeconfig for this play
+      shell: KUBECONFIG={{ kubeconfig_path }} kubectl version --client
+      register: kubectl_version
+      retries: 3
+      delay: 3
+      until: kubectl_version.rc == 0
+
+    - name: Deploy cert-manager CRDs and cert-manager
+      shell: |
+        KUBECONFIG={{ kubeconfig_path }} kubectl apply -f https://github.com/cert-manager/cert-manager/releases/latest/download/cert-manager.crds.yaml
+        KUBECONFIG={{ kubeconfig_path }} kubectl create namespace cert-manager || true
+        KUBECONFIG={{ kubeconfig_path }} kubectl apply -f https://github.com/cert-manager/cert-manager/releases/latest/download/cert-manager.yaml
+      register: certmgr_apply
+      changed_when: certmgr_apply.rc == 0
+
+    - name: Deploy ArgoCD
+      shell: |
+        KUBECONFIG={{ kubeconfig_path }} kubectl create namespace argocd || true
+        KUBECONFIG={{ kubeconfig_path }} kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+      register: argocd_apply
+      changed_when: argocd_apply.rc == 0
+
+    - name: List namespaces (verification)
+      shell: KUBECONFIG={{ kubeconfig_path }} kubectl get ns
+      register: namespaces
+
+    - debug:
+        var: namespaces.stdout_lines

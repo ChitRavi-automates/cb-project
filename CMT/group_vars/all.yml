@@ -1,0 +1,10 @@
+# group_vars/all.yml - cluster variables
+k3s_version: "v1.33.5+k3s1"
+k3s_url: "https://157.90.231.202:6443"
+# leave k3s_token empty here; it will be read from the bootstrap at runtime or passed as extra-var
+k3s_token: ""
+expected_nodes: 4
+node_ready_retries: 20
+node_ready_delay: 15
+taint_control_nodes: true
+# Add any other global variables here (e.g. monitoring/argocd versions)

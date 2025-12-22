@@ -1,0 +1,3583 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    creationTimestamp: "2025-12-08T04:31:33Z"
+    generateName: coredns-64fd4b4794-
+    generation: 1
+    labels:
+      k8s-app: kube-dns
+      pod-template-hash: 64fd4b4794
+    name: coredns-64fd4b4794-k4n6r
+    namespace: kube-system
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: coredns-64fd4b4794
+      uid: 6eeab5ed-abbc-401f-92b6-83412df30e1c
+    resourceVersion: "540"
+    uid: 95919747-d515-47c6-ac51-094009819ceb
+  spec:
+    containers:
+    - args:
+      - -conf
+      - /etc/coredns/Corefile
+      image: rancher/mirrored-coredns-coredns:1.12.3
+      imagePullPolicy: IfNotPresent
+      livenessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /health
+          port: 8080
+          scheme: HTTP
+        initialDelaySeconds: 60
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 1
+      name: coredns
+      ports:
+      - containerPort: 53
+        name: dns
+        protocol: UDP
+      - containerPort: 53
+        name: dns-tcp
+        protocol: TCP
+      - containerPort: 9153
+        name: metrics
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /ready
+          port: 8181
+          scheme: HTTP
+        periodSeconds: 2
+        successThreshold: 1
+        timeoutSeconds: 1
+      resources:
+        limits:
+          memory: 170Mi
+        requests:
+          cpu: 100m
+          memory: 70Mi
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          add:
+          - NET_BIND_SERVICE
+          drop:
+          - all
+        readOnlyRootFilesystem: true
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /etc/coredns
+        name: config-volume
+        readOnly: true
+      - mountPath: /etc/coredns/custom
+        name: custom-config-volume
+        readOnly: true
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-jlbqg
+        readOnly: true
+    dnsPolicy: Default
+    enableServiceLinks: true
+    nodeName: cb-project-control-1
+    nodeSelector:
+      kubernetes.io/os: linux
+    preemptionPolicy: PreemptLowerPriority
+    priority: 2000000000
+    priorityClassName: system-cluster-critical
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: coredns
+    serviceAccountName: coredns
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - key: CriticalAddonsOnly
+      operator: Exists
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/control-plane
+      operator: Exists
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/master
+      operator: Exists
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    topologySpreadConstraints:
+    - labelSelector:
+        matchLabels:
+          k8s-app: kube-dns
+      maxSkew: 1
+      topologyKey: kubernetes.io/hostname
+      whenUnsatisfiable: DoNotSchedule
+    - labelSelector:
+        matchLabels:
+          k8s-app: kube-dns
+      maxSkew: 1
+      topologyKey: topology.kubernetes.io/zone
+      whenUnsatisfiable: ScheduleAnyway
+    volumes:
+    - configMap:
+        defaultMode: 420
+        items:
+        - key: Corefile
+          path: Corefile
+        - key: NodeHosts
+          path: NodeHosts
+        name: coredns
+      name: config-volume
+    - configMap:
+        defaultMode: 420
+        name: coredns-custom
+        optional: true
+      name: custom-config-volume
+    - name: kube-api-access-jlbqg
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:31:42Z"
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:31:34Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:31:42Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:31:42Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:31:34Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - allocatedResources:
+        cpu: 100m
+        memory: 70Mi
+      containerID: containerd://03779e78796b435afadc9c299a9b5220511ce71a877b38aa1b1be1f5fb3cba35
+      image: docker.io/rancher/mirrored-coredns-coredns:1.12.3
+      imageID: docker.io/rancher/mirrored-coredns-coredns@sha256:1391544c978029fcddc65068f6ad67f396e55585b664ecccd7fefba029b9b706
+      lastState: {}
+      name: coredns
+      ready: true
+      resources:
+        limits:
+          memory: 170Mi
+        requests:
+          cpu: 100m
+          memory: 70Mi
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2025-12-08T04:31:42Z"
+      user:
+        linux:
+          gid: 65532
+          supplementalGroups:
+          - 65532
+          uid: 65532
+      volumeMounts:
+      - mountPath: /etc/coredns
+        name: config-volume
+        readOnly: true
+        recursiveReadOnly: Disabled
+      - mountPath: /etc/coredns/custom
+        name: custom-config-volume
+        readOnly: true
+        recursiveReadOnly: Disabled
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-jlbqg
+        readOnly: true
+        recursiveReadOnly: Disabled
+    hostIP: 157.90.231.202
+    hostIPs:
+    - ip: 157.90.231.202
+    - ip: 2a01:4f8:1c1a:5d07::1
+    phase: Running
+    podIP: 10.42.0.6
+    podIPs:
+    - ip: 10.42.0.6
+    qosClass: Burstable
+    startTime: "2025-12-08T04:31:34Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      helmcharts.helm.cattle.io/configHash: SHA256=E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855
+    creationTimestamp: "2025-12-08T04:31:32Z"
+    generateName: helm-install-traefik-crd-
+    generation: 1
+    labels:
+      batch.kubernetes.io/controller-uid: 008fb685-fc57-45d4-8377-ede161f568b1
+      batch.kubernetes.io/job-name: helm-install-traefik-crd
+      controller-uid: 008fb685-fc57-45d4-8377-ede161f568b1
+      helmcharts.helm.cattle.io/chart: traefik-crd
+      job-name: helm-install-traefik-crd
+    name: helm-install-traefik-crd-tgmzw
+    namespace: kube-system
+    ownerReferences:
+    - apiVersion: batch/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Job
+      name: helm-install-traefik-crd
+      uid: 008fb685-fc57-45d4-8377-ede161f568b1
+    resourceVersion: "688"
+    uid: 24c474d1-5840-4ea4-a07a-493ea26b0075
+  spec:
+    containers:
+    - args:
+      - install
+      env:
+      - name: NAME
+        value: traefik-crd
+      - name: VERSION
+      - name: REPO
+      - name: HELM_DRIVER
+        value: secret
+      - name: CHART_NAMESPACE
+        value: kube-system
+      - name: CHART
+        value: https://%{KUBERNETES_API}%/static/charts/traefik-crd-34.2.1+up34.2.0.tgz
+      - name: HELM_VERSION
+      - name: TARGET_NAMESPACE
+        value: kube-system
+      - name: AUTH_PASS_CREDENTIALS
+        value: "false"
+      - name: INSECURE_SKIP_TLS_VERIFY
+        value: "false"
+      - name: PLAIN_HTTP
+        value: "false"
+      - name: NO_PROXY
+        value: .svc,.cluster.local,10.42.0.0/16,10.43.0.0/16
+      - name: FAILURE_POLICY
+        value: reinstall
+      image: rancher/klipper-helm:v0.9.8-build20250709
+      imagePullPolicy: IfNotPresent
+      name: helm
+      resources: {}
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+          - ALL
+        readOnlyRootFilesystem: true
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /home/klipper-helm/.helm
+        name: klipper-helm
+      - mountPath: /home/klipper-helm/.cache
+        name: klipper-cache
+      - mountPath: /home/klipper-helm/.config
+        name: klipper-config
+      - mountPath: /tmp
+        name: tmp
+      - mountPath: /config
+        name: values
+      - mountPath: /chart
+        name: content
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-mvx2d
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: cb-project-control-1
+    nodeSelector:
+      kubernetes.io/os: linux
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: OnFailure
+    schedulerName: default-scheduler
+    securityContext:
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+    serviceAccount: helm-traefik-crd
+    serviceAccountName: helm-traefik-crd
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - emptyDir:
+        medium: Memory
+      name: klipper-helm
+    - emptyDir:
+        medium: Memory
+      name: klipper-cache
+    - emptyDir:
+        medium: Memory
+      name: klipper-config
+    - emptyDir:
+        medium: Memory
+      name: tmp
+    - name: values
+      projected:
+        defaultMode: 420
+        sources:
+        - secret:
+            name: chart-values-traefik-crd
+    - configMap:
+        defaultMode: 420
+        name: chart-content-traefik-crd
+      name: content
+    - name: kube-api-access-mvx2d
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:31:46Z"
+      status: "False"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:31:34Z"
+      reason: PodCompleted
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:31:45Z"
+      reason: PodCompleted
+      status: "False"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:31:45Z"
+      reason: PodCompleted
+      status: "False"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:31:34Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://59ebce27214e6cdd640543f0da1b621a1e9e3240723d43978c744b7f14dcb754
+      image: docker.io/rancher/klipper-helm:v0.9.8-build20250709
+      imageID: docker.io/rancher/klipper-helm@sha256:5e2e5ab00d5f2652bfea2bc5554d07b57a015fe574434b275a2cb11c2d135c04
+      lastState: {}
+      name: helm
+      ready: false
+      resources: {}
+      restartCount: 0
+      started: false
+      state:
+        terminated:
+          containerID: containerd://59ebce27214e6cdd640543f0da1b621a1e9e3240723d43978c744b7f14dcb754
+          exitCode: 0
+          finishedAt: "2025-12-08T04:31:45Z"
+          message: |
+            Installing helm chart
+          reason: Completed
+          startedAt: "2025-12-08T04:31:43Z"
+      user:
+        linux:
+          gid: 1000
+          supplementalGroups:
+          - 1000
+          uid: 1000
+      volumeMounts:
+      - mountPath: /home/klipper-helm/.helm
+        name: klipper-helm
+      - mountPath: /home/klipper-helm/.cache
+        name: klipper-cache
+      - mountPath: /home/klipper-helm/.config
+        name: klipper-config
+      - mountPath: /tmp
+        name: tmp
+      - mountPath: /config
+        name: values
+      - mountPath: /chart
+        name: content
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-mvx2d
+        readOnly: true
+        recursiveReadOnly: Disabled
+    hostIP: 157.90.231.202
+    hostIPs:
+    - ip: 157.90.231.202
+    - ip: 2a01:4f8:1c1a:5d07::1
+    phase: Succeeded
+    podIP: 10.42.0.4
+    podIPs:
+    - ip: 10.42.0.4
+    qosClass: BestEffort
+    startTime: "2025-12-08T04:31:34Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      helmcharts.helm.cattle.io/configHash: SHA256=8717A52E651717B5B0EF9C9B8646C5FC01C1DA0F7D3F6FEBA321FC57FE9A012A
+    creationTimestamp: "2025-12-08T04:31:32Z"
+    generateName: helm-install-traefik-
+    generation: 1
+    labels:
+      batch.kubernetes.io/controller-uid: aec600ce-42e0-4561-bcfa-38c7c44c609c
+      batch.kubernetes.io/job-name: helm-install-traefik
+      controller-uid: aec600ce-42e0-4561-bcfa-38c7c44c609c
+      helmcharts.helm.cattle.io/chart: traefik
+      job-name: helm-install-traefik
+    name: helm-install-traefik-t4g2w
+    namespace: kube-system
+    ownerReferences:
+    - apiVersion: batch/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Job
+      name: helm-install-traefik
+      uid: aec600ce-42e0-4561-bcfa-38c7c44c609c
+    resourceVersion: "811"
+    uid: e93b174c-6c6a-4663-96e4-1be3523baa86
+  spec:
+    containers:
+    - args:
+      - install
+      - --set-string
+      - global.systemDefaultRegistry=
+      env:
+      - name: NAME
+        value: traefik
+      - name: VERSION
+      - name: REPO
+      - name: HELM_DRIVER
+        value: secret
+      - name: CHART_NAMESPACE
+        value: kube-system
+      - name: CHART
+        value: https://%{KUBERNETES_API}%/static/charts/traefik-34.2.1+up34.2.0.tgz
+      - name: HELM_VERSION
+      - name: TARGET_NAMESPACE
+        value: kube-system
+      - name: AUTH_PASS_CREDENTIALS
+        value: "false"
+      - name: INSECURE_SKIP_TLS_VERIFY
+        value: "false"
+      - name: PLAIN_HTTP
+        value: "false"
+      - name: NO_PROXY
+        value: .svc,.cluster.local,10.42.0.0/16,10.43.0.0/16
+      - name: FAILURE_POLICY
+        value: reinstall
+      image: rancher/klipper-helm:v0.9.8-build20250709
+      imagePullPolicy: IfNotPresent
+      name: helm
+      resources: {}
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+          - ALL
+        readOnlyRootFilesystem: true
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /home/klipper-helm/.helm
+        name: klipper-helm
+      - mountPath: /home/klipper-helm/.cache
+        name: klipper-cache
+      - mountPath: /home/klipper-helm/.config
+        name: klipper-config
+      - mountPath: /tmp
+        name: tmp
+      - mountPath: /config
+        name: values
+      - mountPath: /chart
+        name: content
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-pf4wg
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: cb-project-control-1
+    nodeSelector:
+      kubernetes.io/os: linux
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: OnFailure
+    schedulerName: default-scheduler
+    securityContext:
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+    serviceAccount: helm-traefik
+    serviceAccountName: helm-traefik
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - emptyDir:
+        medium: Memory
+      name: klipper-helm
+    - emptyDir:
+        medium: Memory
+      name: klipper-cache
+    - emptyDir:
+        medium: Memory
+      name: klipper-config
+    - emptyDir:
+        medium: Memory
+      name: tmp
+    - name: values
+      projected:
+        defaultMode: 420
+        sources:
+        - secret:
+            items:
+            - key: HelmChartValuesContent
+              path: values-0-000-HelmChart-ValuesContent.yaml
+            name: chart-values-traefik
+    - configMap:
+        defaultMode: 420
+        name: chart-content-traefik
+      name: content
+    - name: kube-api-access-pf4wg
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:32:03Z"
+      status: "False"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:31:34Z"
+      reason: PodCompleted
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:32:02Z"
+      reason: PodCompleted
+      status: "False"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:32:02Z"
+      reason: PodCompleted
+      status: "False"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:31:34Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://f4d8bb021c431275b8772297622a6db81fe3ba0015f2b58203b4f88974dcffbf
+      image: docker.io/rancher/klipper-helm:v0.9.8-build20250709
+      imageID: docker.io/rancher/klipper-helm@sha256:5e2e5ab00d5f2652bfea2bc5554d07b57a015fe574434b275a2cb11c2d135c04
+      lastState: {}
+      name: helm
+      ready: false
+      resources: {}
+      restartCount: 2
+      started: false
+      state:
+        terminated:
+          containerID: containerd://f4d8bb021c431275b8772297622a6db81fe3ba0015f2b58203b4f88974dcffbf
+          exitCode: 0
+          finishedAt: "2025-12-08T04:32:01Z"
+          message: |
+            Installing helm chart
+          reason: Completed
+          startedAt: "2025-12-08T04:32:00Z"
+      user:
+        linux:
+          gid: 1000
+          supplementalGroups:
+          - 1000
+          uid: 1000
+      volumeMounts:
+      - mountPath: /home/klipper-helm/.helm
+        name: klipper-helm
+      - mountPath: /home/klipper-helm/.cache
+        name: klipper-cache
+      - mountPath: /home/klipper-helm/.config
+        name: klipper-config
+      - mountPath: /tmp
+        name: tmp
+      - mountPath: /config
+        name: values
+      - mountPath: /chart
+        name: content
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-pf4wg
+        readOnly: true
+        recursiveReadOnly: Disabled
+    hostIP: 157.90.231.202
+    hostIPs:
+    - ip: 157.90.231.202
+    - ip: 2a01:4f8:1c1a:5d07::1
+    phase: Succeeded
+    podIP: 10.42.0.3
+    podIPs:
+    - ip: 10.42.0.3
+    qosClass: BestEffort
+    startTime: "2025-12-08T04:31:34Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    creationTimestamp: "2025-12-08T04:31:33Z"
+    generateName: local-path-provisioner-774c6665dc-
+    generation: 1
+    labels:
+      app: local-path-provisioner
+      pod-template-hash: 774c6665dc
+    name: local-path-provisioner-774c6665dc-p8w8p
+    namespace: kube-system
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: local-path-provisioner-774c6665dc
+      uid: 12380e86-0aaa-497e-9e04-705e06377263
+    resourceVersion: "563"
+    uid: d04cb39c-ff17-4705-9716-31b1465f3221
+  spec:
+    containers:
+    - command:
+      - local-path-provisioner
+      - start
+      - --config
+      - /etc/config/config.json
+      env:
+      - name: POD_NAMESPACE
+        valueFrom:
+          fieldRef:
+            apiVersion: v1
+            fieldPath: metadata.namespace
+      image: rancher/local-path-provisioner:v0.0.31
+      imagePullPolicy: IfNotPresent
+      name: local-path-provisioner
+      resources: {}
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /etc/config/
+        name: config-volume
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-jrj92
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: cb-project-control-1
+    nodeSelector:
+      kubernetes.io/os: linux
+    preemptionPolicy: PreemptLowerPriority
+    priority: 2000001000
+    priorityClassName: system-node-critical
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: local-path-provisioner-service-account
+    serviceAccountName: local-path-provisioner-service-account
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - key: CriticalAddonsOnly
+      operator: Exists
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/control-plane
+      operator: Exists
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/master
+      operator: Exists
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - configMap:
+        defaultMode: 420
+        name: local-path-config
+      name: config-volume
+    - name: kube-api-access-jrj92
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:31:43Z"
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:31:34Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:31:43Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:31:43Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:31:34Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://5299c6fcf3c207fdecb437f74dd14ac2fc8a54ee478b0d9a8a2ee5b0ecc5068d
+      image: docker.io/rancher/local-path-provisioner:v0.0.31
+      imageID: docker.io/rancher/local-path-provisioner@sha256:80496fdeb307541007621959aa13aed41d31db9cd2dc4167c19833e0bfa3878c
+      lastState: {}
+      name: local-path-provisioner
+      ready: true
+      resources: {}
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2025-12-08T04:31:43Z"
+      user:
+        linux:
+          gid: 0
+          supplementalGroups:
+          - 0
+          - 1
+          - 2
+          - 3
+          - 4
+          - 6
+          - 10
+          - 11
+          - 20
+          - 26
+          - 27
+          uid: 0
+      volumeMounts:
+      - mountPath: /etc/config/
+        name: config-volume
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-jrj92
+        readOnly: true
+        recursiveReadOnly: Disabled
+    hostIP: 157.90.231.202
+    hostIPs:
+    - ip: 157.90.231.202
+    - ip: 2a01:4f8:1c1a:5d07::1
+    phase: Running
+    podIP: 10.42.0.5
+    podIPs:
+    - ip: 10.42.0.5
+    qosClass: BestEffort
+    startTime: "2025-12-08T04:31:34Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    creationTimestamp: "2025-12-08T04:31:33Z"
+    generateName: metrics-server-7bfffcd44-
+    generation: 1
+    labels:
+      k8s-app: metrics-server
+      pod-template-hash: 7bfffcd44
+    name: metrics-server-7bfffcd44-765hx
+    namespace: kube-system
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: metrics-server-7bfffcd44
+      uid: 4796a484-6b8e-471f-8cc2-45c8369c75c5
+    resourceVersion: "733"
+    uid: f3230f4a-70c1-455a-8840-477b6e6915ae
+  spec:
+    containers:
+    - args:
+      - --cert-dir=/tmp
+      - --secure-port=10250
+      - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
+      - --kubelet-use-node-status-port
+      - --metric-resolution=15s
+      - --tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305
+      image: rancher/mirrored-metrics-server:v0.8.0
+      imagePullPolicy: IfNotPresent
+      livenessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /livez
+          port: https
+          scheme: HTTPS
+        initialDelaySeconds: 60
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 1
+      name: metrics-server
+      ports:
+      - containerPort: 10250
+        name: https
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /readyz
+          port: https
+          scheme: HTTPS
+        periodSeconds: 2
+        successThreshold: 1
+        timeoutSeconds: 1
+      resources:
+        requests:
+          cpu: 100m
+          memory: 70Mi
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        runAsUser: 1000
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /tmp
+        name: tmp-dir
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-snr6v
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: cb-project-control-1
+    nodeSelector:
+      kubernetes.io/os: linux
+    preemptionPolicy: PreemptLowerPriority
+    priority: 2000001000
+    priorityClassName: system-node-critical
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: metrics-server
+    serviceAccountName: metrics-server
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - key: CriticalAddonsOnly
+      operator: Exists
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/control-plane
+      operator: Exists
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/master
+      operator: Exists
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - emptyDir: {}
+      name: tmp-dir
+    - name: kube-api-access-snr6v
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:31:43Z"
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:31:34Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:31:59Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:31:59Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:31:34Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - allocatedResources:
+        cpu: 100m
+        memory: 70Mi
+      containerID: containerd://2726b1e3c79bd2885628ca6253885bdba127936ef2ac019ba801f6dcca8a8cec
+      image: docker.io/rancher/mirrored-metrics-server:v0.8.0
+      imageID: docker.io/rancher/mirrored-metrics-server@sha256:89258156d0e9af60403eafd44da9676fd66f600c7934d468ccc17e42b199aee2
+      lastState: {}
+      name: metrics-server
+      ready: true
+      resources:
+        requests:
+          cpu: 100m
+          memory: 70Mi
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2025-12-08T04:31:43Z"
+      user:
+        linux:
+          gid: 0
+          supplementalGroups:
+          - 0
+          uid: 1000
+      volumeMounts:
+      - mountPath: /tmp
+        name: tmp-dir
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-snr6v
+        readOnly: true
+        recursiveReadOnly: Disabled
+    hostIP: 157.90.231.202
+    hostIPs:
+    - ip: 157.90.231.202
+    - ip: 2a01:4f8:1c1a:5d07::1
+    phase: Running
+    podIP: 10.42.0.2
+    podIPs:
+    - ip: 10.42.0.2
+    qosClass: Burstable
+    startTime: "2025-12-08T04:31:34Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    creationTimestamp: "2025-12-08T04:32:01Z"
+    generateName: svclb-traefik-2f9c1d9f-
+    generation: 1
+    labels:
+      app: svclb-traefik-2f9c1d9f
+      controller-revision-hash: 555994c785
+      pod-template-generation: "1"
+      svccontroller.k3s.cattle.io/svcname: traefik
+      svccontroller.k3s.cattle.io/svcnamespace: kube-system
+    name: svclb-traefik-2f9c1d9f-6v4nm
+    namespace: kube-system
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: DaemonSet
+      name: svclb-traefik-2f9c1d9f
+      uid: c9ff5218-0a12-4e97-9aa5-247eb63ccc3d
+    resourceVersion: "813"
+    uid: e2f26bfe-2104-4944-a5c9-e4ba4b1d59c2
+  spec:
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchFields:
+            - key: metadata.name
+              operator: In
+              values:
+              - cb-project-control-1
+    automountServiceAccountToken: false
+    containers:
+    - env:
+      - name: SRC_PORT
+        value: "80"
+      - name: SRC_RANGES
+        value: 0.0.0.0/0
+      - name: DEST_PROTO
+        value: TCP
+      - name: DEST_PORT
+        value: "80"
+      - name: DEST_IPS
+        value: 10.43.143.125
+      image: rancher/klipper-lb:v0.4.13
+      imagePullPolicy: IfNotPresent
+      name: lb-tcp-80
+      ports:
+      - containerPort: 80
+        hostPort: 80
+        name: lb-tcp-80
+        protocol: TCP
+      resources: {}
+      securityContext:
+        capabilities:
+          add:
+          - NET_ADMIN
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+    - env:
+      - name: SRC_PORT
+        value: "443"
+      - name: SRC_RANGES
+        value: 0.0.0.0/0
+      - name: DEST_PROTO
+        value: TCP
+      - name: DEST_PORT
+        value: "443"
+      - name: DEST_IPS
+        value: 10.43.143.125
+      image: rancher/klipper-lb:v0.4.13
+      imagePullPolicy: IfNotPresent
+      name: lb-tcp-443
+      ports:
+      - containerPort: 443
+        hostPort: 443
+        name: lb-tcp-443
+        protocol: TCP
+      resources: {}
+      securityContext:
+        capabilities:
+          add:
+          - NET_ADMIN
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: cb-project-control-1
+    preemptionPolicy: PreemptLowerPriority
+    priority: 2000001000
+    priorityClassName: system-node-critical
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext:
+      sysctls:
+      - name: net.ipv4.ip_forward
+        value: "1"
+    serviceAccount: svclb
+    serviceAccountName: svclb
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/master
+      operator: Exists
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/control-plane
+      operator: Exists
+    - key: CriticalAddonsOnly
+      operator: Exists
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+    - effect: NoSchedule
+      key: node.kubernetes.io/disk-pressure
+      operator: Exists
+    - effect: NoSchedule
+      key: node.kubernetes.io/memory-pressure
+      operator: Exists
+    - effect: NoSchedule
+      key: node.kubernetes.io/pid-pressure
+      operator: Exists
+    - effect: NoSchedule
+      key: node.kubernetes.io/unschedulable
+      operator: Exists
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:32:04Z"
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:32:01Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:32:04Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:32:04Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:32:01Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://9662854994b055faa847611446ce9a460420a5cb55d5943d46c2ecd09462964a
+      image: docker.io/rancher/klipper-lb:v0.4.13
+      imageID: docker.io/rancher/klipper-lb@sha256:7eb86d5b908ec6ddd9796253d8cc2f43df99420fc8b8a18452a94dc56f86aca0
+      lastState: {}
+      name: lb-tcp-443
+      ready: true
+      resources: {}
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2025-12-08T04:32:04Z"
+      user:
+        linux:
+          gid: 0
+          supplementalGroups:
+          - 0
+          - 1
+          - 2
+          - 3
+          - 4
+          - 6
+          - 10
+          - 11
+          - 20
+          - 26
+          - 27
+          uid: 0
+    - containerID: containerd://cd2a7a8fd5891bfed0006f7265798a2ab122e5f599dba7edbc37c5ab1154730b
+      image: docker.io/rancher/klipper-lb:v0.4.13
+      imageID: docker.io/rancher/klipper-lb@sha256:7eb86d5b908ec6ddd9796253d8cc2f43df99420fc8b8a18452a94dc56f86aca0
+      lastState: {}
+      name: lb-tcp-80
+      ready: true
+      resources: {}
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2025-12-08T04:32:04Z"
+      user:
+        linux:
+          gid: 0
+          supplementalGroups:
+          - 0
+          - 1
+          - 2
+          - 3
+          - 4
+          - 6
+          - 10
+          - 11
+          - 20
+          - 26
+          - 27
+          uid: 0
+    hostIP: 157.90.231.202
+    hostIPs:
+    - ip: 157.90.231.202
+    - ip: 2a01:4f8:1c1a:5d07::1
+    phase: Running
+    podIP: 10.42.0.7
+    podIPs:
+    - ip: 10.42.0.7
+    qosClass: BestEffort
+    startTime: "2025-12-08T04:32:01Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    creationTimestamp: "2025-12-08T04:49:27Z"
+    generateName: svclb-traefik-2f9c1d9f-
+    generation: 1
+    labels:
+      app: svclb-traefik-2f9c1d9f
+      controller-revision-hash: 555994c785
+      pod-template-generation: "1"
+      svccontroller.k3s.cattle.io/svcname: traefik
+      svccontroller.k3s.cattle.io/svcnamespace: kube-system
+    name: svclb-traefik-2f9c1d9f-8ds58
+    namespace: kube-system
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: DaemonSet
+      name: svclb-traefik-2f9c1d9f
+      uid: c9ff5218-0a12-4e97-9aa5-247eb63ccc3d
+    resourceVersion: "3865"
+    uid: 2373d101-13a0-4477-b524-004a92b24b9b
+  spec:
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchFields:
+            - key: metadata.name
+              operator: In
+              values:
+              - cb-project-control-0
+    automountServiceAccountToken: false
+    containers:
+    - env:
+      - name: SRC_PORT
+        value: "80"
+      - name: SRC_RANGES
+        value: 0.0.0.0/0
+      - name: DEST_PROTO
+        value: TCP
+      - name: DEST_PORT
+        value: "80"
+      - name: DEST_IPS
+        value: 10.43.143.125
+      image: rancher/klipper-lb:v0.4.13
+      imagePullPolicy: IfNotPresent
+      name: lb-tcp-80
+      ports:
+      - containerPort: 80
+        hostPort: 80
+        name: lb-tcp-80
+        protocol: TCP
+      resources: {}
+      securityContext:
+        capabilities:
+          add:
+          - NET_ADMIN
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+    - env:
+      - name: SRC_PORT
+        value: "443"
+      - name: SRC_RANGES
+        value: 0.0.0.0/0
+      - name: DEST_PROTO
+        value: TCP
+      - name: DEST_PORT
+        value: "443"
+      - name: DEST_IPS
+        value: 10.43.143.125
+      image: rancher/klipper-lb:v0.4.13
+      imagePullPolicy: IfNotPresent
+      name: lb-tcp-443
+      ports:
+      - containerPort: 443
+        hostPort: 443
+        name: lb-tcp-443
+        protocol: TCP
+      resources: {}
+      securityContext:
+        capabilities:
+          add:
+          - NET_ADMIN
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: cb-project-control-0
+    preemptionPolicy: PreemptLowerPriority
+    priority: 2000001000
+    priorityClassName: system-node-critical
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext:
+      sysctls:
+      - name: net.ipv4.ip_forward
+        value: "1"
+    serviceAccount: svclb
+    serviceAccountName: svclb
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/master
+      operator: Exists
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/control-plane
+      operator: Exists
+    - key: CriticalAddonsOnly
+      operator: Exists
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+    - effect: NoSchedule
+      key: node.kubernetes.io/disk-pressure
+      operator: Exists
+    - effect: NoSchedule
+      key: node.kubernetes.io/memory-pressure
+      operator: Exists
+    - effect: NoSchedule
+      key: node.kubernetes.io/pid-pressure
+      operator: Exists
+    - effect: NoSchedule
+      key: node.kubernetes.io/unschedulable
+      operator: Exists
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:49:44Z"
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:49:28Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:49:44Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:49:44Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:49:27Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://abdcbab99ec5454f18147ac212ced80f3018b1424b4fc7147386d70c1d49896f
+      image: docker.io/rancher/klipper-lb:v0.4.13
+      imageID: docker.io/rancher/klipper-lb@sha256:7eb86d5b908ec6ddd9796253d8cc2f43df99420fc8b8a18452a94dc56f86aca0
+      lastState: {}
+      name: lb-tcp-443
+      ready: true
+      resources: {}
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2025-12-08T04:49:43Z"
+      user:
+        linux:
+          gid: 0
+          supplementalGroups:
+          - 0
+          - 1
+          - 2
+          - 3
+          - 4
+          - 6
+          - 10
+          - 11
+          - 20
+          - 26
+          - 27
+          uid: 0
+    - containerID: containerd://c81eeecc13426f880be988f7c626ef2be89c265e852709feb618a47c437acb11
+      image: docker.io/rancher/klipper-lb:v0.4.13
+      imageID: docker.io/rancher/klipper-lb@sha256:7eb86d5b908ec6ddd9796253d8cc2f43df99420fc8b8a18452a94dc56f86aca0
+      lastState: {}
+      name: lb-tcp-80
+      ready: true
+      resources: {}
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2025-12-08T04:49:43Z"
+      user:
+        linux:
+          gid: 0
+          supplementalGroups:
+          - 0
+          - 1
+          - 2
+          - 3
+          - 4
+          - 6
+          - 10
+          - 11
+          - 20
+          - 26
+          - 27
+          uid: 0
+    hostIP: 46.224.58.97
+    hostIPs:
+    - ip: 46.224.58.97
+    - ip: 2a01:4f8:1c1a:56df::1
+    phase: Running
+    podIP: 10.42.1.2
+    podIPs:
+    - ip: 10.42.1.2
+    qosClass: BestEffort
+    startTime: "2025-12-08T04:49:28Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    creationTimestamp: "2025-12-08T04:49:46Z"
+    generateName: svclb-traefik-2f9c1d9f-
+    generation: 1
+    labels:
+      app: svclb-traefik-2f9c1d9f
+      controller-revision-hash: 555994c785
+      pod-template-generation: "1"
+      svccontroller.k3s.cattle.io/svcname: traefik
+      svccontroller.k3s.cattle.io/svcnamespace: kube-system
+    name: svclb-traefik-2f9c1d9f-8xtsk
+    namespace: kube-system
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: DaemonSet
+      name: svclb-traefik-2f9c1d9f
+      uid: c9ff5218-0a12-4e97-9aa5-247eb63ccc3d
+    resourceVersion: "3967"
+    uid: 58b9de7a-a128-4312-b034-9d6224ab062f
+  spec:
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchFields:
+            - key: metadata.name
+              operator: In
+              values:
+              - cb-project-control-2
+    automountServiceAccountToken: false
+    containers:
+    - env:
+      - name: SRC_PORT
+        value: "80"
+      - name: SRC_RANGES
+        value: 0.0.0.0/0
+      - name: DEST_PROTO
+        value: TCP
+      - name: DEST_PORT
+        value: "80"
+      - name: DEST_IPS
+        value: 10.43.143.125
+      image: rancher/klipper-lb:v0.4.13
+      imagePullPolicy: IfNotPresent
+      name: lb-tcp-80
+      ports:
+      - containerPort: 80
+        hostPort: 80
+        name: lb-tcp-80
+        protocol: TCP
+      resources: {}
+      securityContext:
+        capabilities:
+          add:
+          - NET_ADMIN
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+    - env:
+      - name: SRC_PORT
+        value: "443"
+      - name: SRC_RANGES
+        value: 0.0.0.0/0
+      - name: DEST_PROTO
+        value: TCP
+      - name: DEST_PORT
+        value: "443"
+      - name: DEST_IPS
+        value: 10.43.143.125
+      image: rancher/klipper-lb:v0.4.13
+      imagePullPolicy: IfNotPresent
+      name: lb-tcp-443
+      ports:
+      - containerPort: 443
+        hostPort: 443
+        name: lb-tcp-443
+        protocol: TCP
+      resources: {}
+      securityContext:
+        capabilities:
+          add:
+          - NET_ADMIN
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: cb-project-control-2
+    preemptionPolicy: PreemptLowerPriority
+    priority: 2000001000
+    priorityClassName: system-node-critical
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext:
+      sysctls:
+      - name: net.ipv4.ip_forward
+        value: "1"
+    serviceAccount: svclb
+    serviceAccountName: svclb
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/master
+      operator: Exists
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/control-plane
+      operator: Exists
+    - key: CriticalAddonsOnly
+      operator: Exists
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+    - effect: NoSchedule
+      key: node.kubernetes.io/disk-pressure
+      operator: Exists
+    - effect: NoSchedule
+      key: node.kubernetes.io/memory-pressure
+      operator: Exists
+    - effect: NoSchedule
+      key: node.kubernetes.io/pid-pressure
+      operator: Exists
+    - effect: NoSchedule
+      key: node.kubernetes.io/unschedulable
+      operator: Exists
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:50:04Z"
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:49:46Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:50:04Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:50:04Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:49:46Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://b0c6939dfcecb6d912a126bd94042b09c618d316fc402bca572de193d6804391
+      image: docker.io/rancher/klipper-lb:v0.4.13
+      imageID: docker.io/rancher/klipper-lb@sha256:7eb86d5b908ec6ddd9796253d8cc2f43df99420fc8b8a18452a94dc56f86aca0
+      lastState: {}
+      name: lb-tcp-443
+      ready: true
+      resources: {}
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2025-12-08T04:50:03Z"
+      user:
+        linux:
+          gid: 0
+          supplementalGroups:
+          - 0
+          - 1
+          - 2
+          - 3
+          - 4
+          - 6
+          - 10
+          - 11
+          - 20
+          - 26
+          - 27
+          uid: 0
+    - containerID: containerd://9b891caa2442c11509ec88f8e2d60b04f79d776cb990798e500682b358f0ef41
+      image: docker.io/rancher/klipper-lb:v0.4.13
+      imageID: docker.io/rancher/klipper-lb@sha256:7eb86d5b908ec6ddd9796253d8cc2f43df99420fc8b8a18452a94dc56f86aca0
+      lastState: {}
+      name: lb-tcp-80
+      ready: true
+      resources: {}
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2025-12-08T04:50:03Z"
+      user:
+        linux:
+          gid: 0
+          supplementalGroups:
+          - 0
+          - 1
+          - 2
+          - 3
+          - 4
+          - 6
+          - 10
+          - 11
+          - 20
+          - 26
+          - 27
+          uid: 0
+    hostIP: 49.13.236.108
+    hostIPs:
+    - ip: 49.13.236.108
+    - ip: 2a01:4f8:1c1a:1850::1
+    phase: Running
+    podIP: 10.42.2.2
+    podIPs:
+    - ip: 10.42.2.2
+    qosClass: BestEffort
+    startTime: "2025-12-08T04:49:46Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      prometheus.io/path: /metrics
+      prometheus.io/port: "9100"
+      prometheus.io/scrape: "true"
+    creationTimestamp: "2025-12-08T04:32:01Z"
+    generateName: traefik-c98fdf6fb-
+    generation: 1
+    labels:
+      app.kubernetes.io/instance: traefik-kube-system
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: traefik
+      helm.sh/chart: traefik-34.2.1_up34.2.0
+      pod-template-hash: c98fdf6fb
+    name: traefik-c98fdf6fb-fqhlm
+    namespace: kube-system
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: traefik-c98fdf6fb
+      uid: 3f697b49-2af0-42ee-9360-4030806bff11
+    resourceVersion: "863"
+    uid: 05278574-95dd-44e0-96a5-93c3f8afd94a
+  spec:
+    automountServiceAccountToken: true
+    containers:
+    - args:
+      - --global.checknewversion
+      - --global.sendanonymoususage
+      - --entryPoints.metrics.address=:9100/tcp
+      - --entryPoints.traefik.address=:8080/tcp
+      - --entryPoints.web.address=:8000/tcp
+      - --entryPoints.websecure.address=:8443/tcp
+      - --api.dashboard=true
+      - --ping=true
+      - --metrics.prometheus=true
+      - --metrics.prometheus.entrypoint=metrics
+      - --providers.kubernetescrd
+      - --providers.kubernetescrd.allowEmptyServices=true
+      - --providers.kubernetesingress
+      - --providers.kubernetesingress.allowEmptyServices=true
+      - --providers.kubernetesingress.ingressendpoint.publishedservice=kube-system/traefik
+      - --entryPoints.websecure.http.tls=true
+      - --log.level=INFO
+      env:
+      - name: POD_NAME
+        valueFrom:
+          fieldRef:
+            apiVersion: v1
+            fieldPath: metadata.name
+      - name: POD_NAMESPACE
+        valueFrom:
+          fieldRef:
+            apiVersion: v1
+            fieldPath: metadata.namespace
+      image: rancher/mirrored-library-traefik:3.3.6
+      imagePullPolicy: IfNotPresent
+      livenessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /ping
+          port: 8080
+          scheme: HTTP
+        initialDelaySeconds: 2
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 2
+      name: traefik
+      ports:
+      - containerPort: 9100
+        name: metrics
+        protocol: TCP
+      - containerPort: 8080
+        name: traefik
+        protocol: TCP
+      - containerPort: 8000
+        name: web
+        protocol: TCP
+      - containerPort: 8443
+        name: websecure
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 1
+        httpGet:
+          path: /ping
+          port: 8080
+          scheme: HTTP
+        initialDelaySeconds: 2
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 2
+      resources: {}
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+          - ALL
+        readOnlyRootFilesystem: true
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /data
+        name: data
+      - mountPath: /tmp
+        name: tmp
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-9rcrg
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: cb-project-control-1
+    preemptionPolicy: PreemptLowerPriority
+    priority: 2000000000
+    priorityClassName: system-cluster-critical
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext:
+      runAsGroup: 65532
+      runAsNonRoot: true
+      runAsUser: 65532
+    serviceAccount: traefik
+    serviceAccountName: traefik
+    terminationGracePeriodSeconds: 60
+    tolerations:
+    - key: CriticalAddonsOnly
+      operator: Exists
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/control-plane
+      operator: Exists
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/master
+      operator: Exists
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - emptyDir: {}
+      name: data
+    - emptyDir: {}
+      name: tmp
+    - name: kube-api-access-9rcrg
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:32:06Z"
+      status: "True"
+      type: PodReadyToStartContainers
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:32:01Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:32:17Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:32:17Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2025-12-08T04:32:01Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://f9a37ea25929b591005ed4070add1949c40f4a49625d7935c638f7b73aafaefb
+      image: docker.io/rancher/mirrored-library-traefik:3.3.6
+      imageID: docker.io/rancher/mirrored-library-traefik@sha256:9595fc80fa8ed6c5f3876416332ca7c88e8f255daaf265cff6b857b8d0f44503
+      lastState: {}
+      name: traefik
+      ready: true
+      resources: {}
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2025-12-08T04:32:06Z"
+      user:
+        linux:
+          gid: 65532
+          supplementalGroups:
+          - 65532
+          uid: 65532
+      volumeMounts:
+      - mountPath: /data
+        name: data
+      - mountPath: /tmp
+        name: tmp
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-9rcrg
+        readOnly: true
+        recursiveReadOnly: Disabled
+    hostIP: 157.90.231.202
+    hostIPs:
+    - ip: 157.90.231.202
+    - ip: 2a01:4f8:1c1a:5d07::1
+    phase: Running
+    podIP: 10.42.0.8
+    podIPs:
+    - ip: 10.42.0.8
+    qosClass: BestEffort
+    startTime: "2025-12-08T04:32:01Z"
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      objectset.rio.cattle.io/applied: H4sIAAAAAAAA/4ySQYvbMBCF/0p5Z9m142TjFfRQdimUQgmk7aXsQZYnG9W2JKRJSgj+70WJl00b0vZm8958vHmjI5Q33yhE4ywk9iUEOmNbSKwp7I0mCAzEqlWsII9Q1jpWbJyN6dc1P0hzJM6DcblWzD3lxr01iQBxU3c/LYXsed9BoqvihbIvxZtPxrbv3rets/9EWDUQJLQL1Nr4X/bolU4z3a6hLB4i0wABH9xAvKVdTG7vAkPivlxUV1rUQfkE4LAjjAK9aqg/1dHVMVPev8DPidJnsMR0mtb9LjKFLE71Tpg/bdNeDy7Q4+f1X/baqriFRKNpVlez+7ouy+W8UkVV36lmURab2eZuSZvlfDYv9GKZ8k7si4i3ahkFoiedVptyf1xBoizyeZUXeVlAvAoR8vul9CRg/Ac1mP6wcr3Rh/SojH3uac1Kd6lXFzhNHV8indOcy19Up+LZaddD4uvjCqO4dGas/S33l4ff3ANxMPqVne567X8SiNSTZhduHHMcx18BAAD//5X9LCMyAwAA
+      objectset.rio.cattle.io/id: ""
+      objectset.rio.cattle.io/owner-gvk: k3s.cattle.io/v1, Kind=Addon
+      objectset.rio.cattle.io/owner-name: coredns
+      objectset.rio.cattle.io/owner-namespace: kube-system
+      prometheus.io/port: "9153"
+      prometheus.io/scrape: "true"
+    creationTimestamp: "2025-12-08T04:31:30Z"
+    labels:
+      k8s-app: kube-dns
+      kubernetes.io/cluster-service: "true"
+      kubernetes.io/name: CoreDNS
+      objectset.rio.cattle.io/hash: bce283298811743a0386ab510f2f67ef74240c57
+    name: kube-dns
+    namespace: kube-system
+    resourceVersion: "295"
+    uid: 4ffc5a05-22f3-4904-977c-0df136d144dc
+  spec:
+    clusterIP: 10.43.0.10
+    clusterIPs:
+    - 10.43.0.10
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: dns
+      port: 53
+      protocol: UDP
+      targetPort: 53
+    - name: dns-tcp
+      port: 53
+      protocol: TCP
+      targetPort: 53
+    - name: metrics
+      port: 9153
+      protocol: TCP
+      targetPort: 9153
+    selector:
+      k8s-app: kube-dns
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      objectset.rio.cattle.io/applied: H4sIAAAAAAAA/4SQQWsbMRCF/0p5Z9nNep04FfRQWnopBUNKL6WHWe04VleWhGa8xZj970UbFxLaJCchvZn3vqczKPvvXMSnCIuxgcHgYw+LOy6jdwyDAyv1pAR7BsWYlNSnKPWaul/sVFiXxaelI9XAS5/e+uoA86yefkcui/txgMXQyiNlbMybLz727z/0fYqvWkQ6MGxFLN7JQriMXObjgf31bcnkqsVw7HghJ1E+YDII1HGYO1ahRFaWuujCUfRRhIWWY016Onbh+vqE6wWePckeFnTdt527uWrc7abhZtXuqF11q83uev2uu2HabK46t1tTJfxvdTy8P1NKMrtayefPdPDhtE3BuxMstoV3XD4dKdwpuQEGORUV2B/nvzl71SwXAXa9bg1ySZpcCrD49nELA6Vyz7qdJy4L008D4cBOU5l/81YWlPO/4NM0/QkAAP//sKxN444CAAA
+      objectset.rio.cattle.io/id: ""
+      objectset.rio.cattle.io/owner-gvk: k3s.cattle.io/v1, Kind=Addon
+      objectset.rio.cattle.io/owner-name: metrics-server-service
+      objectset.rio.cattle.io/owner-namespace: kube-system
+    creationTimestamp: "2025-12-08T04:31:30Z"
+    labels:
+      kubernetes.io/cluster-service: "true"
+      kubernetes.io/name: Metrics-server
+      objectset.rio.cattle.io/hash: a5d3bc601c871e123fa32b27f549b6ea770bcf4a
+    name: metrics-server
+    namespace: kube-system
+    resourceVersion: "341"
+    uid: a9e03ac3-d781-4f0e-a04b-fe667ca1d5fd
+  spec:
+    clusterIP: 10.43.69.146
+    clusterIPs:
+    - 10.43.69.146
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: PreferDualStack
+    ports:
+    - name: https
+      port: 443
+      protocol: TCP
+      targetPort: https
+    selector:
+      k8s-app: metrics-server
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: traefik
+      meta.helm.sh/release-namespace: kube-system
+    creationTimestamp: "2025-12-08T04:32:01Z"
+    finalizers:
+    - service.kubernetes.io/load-balancer-cleanup
+    labels:
+      app.kubernetes.io/instance: traefik-kube-system
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: traefik
+      helm.sh/chart: traefik-34.2.1_up34.2.0
+    name: traefik
+    namespace: kube-system
+    resourceVersion: "3968"
+    uid: 2f9c1d9f-162f-4c11-a005-c5f7126c7bdd
+  spec:
+    allocateLoadBalancerNodePorts: true
+    clusterIP: 10.43.143.125
+    clusterIPs:
+    - 10.43.143.125
+    externalTrafficPolicy: Cluster
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: PreferDualStack
+    ports:
+    - name: web
+      nodePort: 30755
+      port: 80
+      protocol: TCP
+      targetPort: web
+    - name: websecure
+      nodePort: 30098
+      port: 443
+      protocol: TCP
+      targetPort: websecure
+    selector:
+      app.kubernetes.io/instance: traefik-kube-system
+      app.kubernetes.io/name: traefik
+    sessionAffinity: None
+    type: LoadBalancer
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 157.90.231.202
+        ipMode: VIP
+      - ip: 46.224.58.97
+        ipMode: VIP
+      - ip: 49.13.236.108
+        ipMode: VIP
+- apiVersion: apps/v1
+  kind: DaemonSet
+  metadata:
+    annotations:
+      deprecated.daemonset.template.generation: "1"
+      objectset.rio.cattle.io/applied: H4sIAAAAAAAA/8RVYW8iNxD9K9V8XhYIJIWV+iFKoipqjyDg+uWEoll7Nrh4bcue3QuK9r9XXkhu04MkqtQ7IYRszzyP3xvePAE69Rf5oKyBDNC50K+HkMBWGQkZXCOV1iyJIYGSGCUyQvYEaIxlZGVNiEub/02CA3HqlU0FMmtKle2riAHJyXP71ZDvPdRbyKBfD5Nf/lBG/rYkXytB7+YZLAkyYI9UqO2HwoNDEXO2VU69sAtMJTQJCE/tY1aqpMBYOshMpXUCGnPSbz5xg2EDGUxGF4XIBQ3OzuS5RDrPRxcX03FBQ8JiNJmK6QiLX6WABEIthDXsrdbk0+0odNCMlRRIk2DrIYMCdaB3UkItviPiA/EnmDhAhVrovHcA7J0VUzGU0wL25ydSgyMRmfpW/xOUyGLz5wuJ6Nxp8KZJgKl0Gpna3E6/fUCgN7F/HIUdIrBiW9rK8KGhL4WIq5XdkoGs1TaBeAkqQz5A9uUJyNTt76Ge5eLqfn63WEECNeoqbk0G0CSvAhaXs99vlp2QQdp++q8ir2+Wq/v54m5114lcXc2/j3nrvjbidt69bThIx6N0GL9n59CsE1AlPsQTj0ZsyPe3WjlHvqfzrB6k43Q4gkPQvNJ6brUSO8jgtphZnnsKZBheWjHKKVxvMoAEnPW85+mFtrn1DNlkkMDGBv62OpbtLVth9fO71wl4CrbygmIHReVIVF7x7soapkduOw8d5korVrRvMykh+wKzm9X95fWn2xmsmyby875w4/Hoxyr3rwt/mnSxjje0G49HXfHa5VGA/02+dQRXtk3VGMLsYILtX7oXPbknvGIlUMPRW8IuCNah2wCGOFWuHqfK3RfWf0Uvu8RDs24L7hrDrOO9kABbTf55xkZrKAoSDBnM7FJsSFY6joYtRf7bGr3VlEYz8oaYQnSqEgOTj6PRRax2qNw8qsCh7Yz/AnlwxZ7TaOgk8h7j6sDapZTWhDujd8cT1tE2KyeRackemR52kdZovso8fG4P9uPk8bPBGpXGXBNkwzgydi6ytngV29owI1et6KLyngzPqjIn//xQCdkgAUlBeZLHjky790mFcGR7QSh3kA2a5p8AAAD//3SHV+ZDCQAA
+      objectset.rio.cattle.io/id: ""
+      objectset.rio.cattle.io/owner-gvk: /v1, Kind=Service
+      objectset.rio.cattle.io/owner-name: traefik
+      objectset.rio.cattle.io/owner-namespace: kube-system
+    creationTimestamp: "2025-12-08T04:32:01Z"
+    generation: 1
+    labels:
+      objectset.rio.cattle.io/hash: 836fcbce022d5dae5b36694fe1eaf389c93af7dc
+      svccontroller.k3s.cattle.io/nodeselector: "false"
+      svccontroller.k3s.cattle.io/svcname: traefik
+      svccontroller.k3s.cattle.io/svcnamespace: kube-system
+    name: svclb-traefik-2f9c1d9f
+    namespace: kube-system
+    resourceVersion: "3969"
+    uid: c9ff5218-0a12-4e97-9aa5-247eb63ccc3d
+  spec:
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: svclb-traefik-2f9c1d9f
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: svclb-traefik-2f9c1d9f
+          svccontroller.k3s.cattle.io/svcname: traefik
+          svccontroller.k3s.cattle.io/svcnamespace: kube-system
+      spec:
+        automountServiceAccountToken: false
+        containers:
+        - env:
+          - name: SRC_PORT
+            value: "80"
+          - name: SRC_RANGES
+            value: 0.0.0.0/0
+          - name: DEST_PROTO
+            value: TCP
+          - name: DEST_PORT
+            value: "80"
+          - name: DEST_IPS
+            value: 10.43.143.125
+          image: rancher/klipper-lb:v0.4.13
+          imagePullPolicy: IfNotPresent
+          name: lb-tcp-80
+          ports:
+          - containerPort: 80
+            hostPort: 80
+            name: lb-tcp-80
+            protocol: TCP
+          resources: {}
+          securityContext:
+            capabilities:
+              add:
+              - NET_ADMIN
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        - env:
+          - name: SRC_PORT
+            value: "443"
+          - name: SRC_RANGES
+            value: 0.0.0.0/0
+          - name: DEST_PROTO
+            value: TCP
+          - name: DEST_PORT
+            value: "443"
+          - name: DEST_IPS
+            value: 10.43.143.125
+          image: rancher/klipper-lb:v0.4.13
+          imagePullPolicy: IfNotPresent
+          name: lb-tcp-443
+          ports:
+          - containerPort: 443
+            hostPort: 443
+            name: lb-tcp-443
+            protocol: TCP
+          resources: {}
+          securityContext:
+            capabilities:
+              add:
+              - NET_ADMIN
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        priorityClassName: system-node-critical
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          sysctls:
+          - name: net.ipv4.ip_forward
+            value: "1"
+        serviceAccount: svclb
+        serviceAccountName: svclb
+        terminationGracePeriodSeconds: 30
+        tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+          operator: Exists
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
+        - key: CriticalAddonsOnly
+          operator: Exists
+    updateStrategy:
+      rollingUpdate:
+        maxSurge: 0
+        maxUnavailable: 1
+      type: RollingUpdate
+  status:
+    currentNumberScheduled: 3
+    desiredNumberScheduled: 3
+    numberAvailable: 3
+    numberMisscheduled: 0
+    numberReady: 3
+    observedGeneration: 1
+    updatedNumberScheduled: 3
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      objectset.rio.cattle.io/applied: H4sIAAAAAAAA/6xV3W7bOBN9lQ9zLcVW3DaugO+iG2e3RVuvUSe9KYKCpkYW1xSHS46caAO/+2Ik27Hb/LSLXtkiZ4bnnPm7A+XNZwzRkIMclPdxsM4ggZVxBeQwQW+prdExJFAjq0KxgvwOlHPEig25KJ+0+As1R+STYOhEK2aLJ4YGRoJA8ug93TgM6XK9ghxWo3hws86S/703rvj/m6Ig92wIp2qEHDQFLFz8IfPolRafVbPANLaRsYZNAlYt0HakVuOYKu93Jn1c+RscMkaJtn32nAJOpvMnnq1UrCCHhcbT8ej09XicZWcvRmo4Gr9Si5fZsDwtX51hefbi9MVQvzwTIN9RegJ09KgFcsC1kVy+NZEptB9MbRjyYQIRLWqmIEa1Yl19eIrmRkJyUIzLtgtL1hq3vPKFYuxD3F45tVbGqoVFyLNNAtx6QfbpyFbOsfZ253dQQk8KvTkgpcmxMg5DhPzLHaiwlD+QanIlJDBA1oOtSgPJRGkswnUCplZLQRSU0xWGQW1CELN0a7z7zbOT7PRkBFuPWWPtjKzRLeTwrpwSzwLGvgWsWaPDGGeBFh2hUhnbBLysAsaKbAH5KIGK2f+BLPdeseR9UKGyXEECngJDPh6OJSm6wi7Hby8vZyKVcYaNshO0qp2jJldEyF8NE/AYDBX7o0ycG60xxoOXswTY1EgN3xs+VEcCoZdyr+ysQ/VytLfeWgZi0mQhh6uJIHzGJWXtj90uzx90e50dONbIwej4gON1AgFVYf6T5OLZ3iuejbMfVfx7wU9/Qu+AkZqgsSttKx0Y+9KvKUhJZWfDjwY6w78bjP2t9o1cDYd1N2i3pr2ltALqJhhuz8kx3nY0lbV0MwtmbSwu8SJqZbt5DHmpbMQEtPJqYaxh00NRRSFtM724/Prbu+nk6/zi0+d35xfSKUUgL3fKWrje9KL/6Wz7iYh/Nxa3gybn0OAmgTXZpsaP1LhtHdXyd7bV/aAd4aD6XGmWae8J9y/sYj4eY6CbyFQfhOq+02ciXkvxFC7uO3mCpWqsNLGjAucH8/B4pFOEHKxxza3kyAdDnfBWxTjtAfRqpNo2kTGkOhg2WlmQNIW10fhGayEz/bbxmCyG3dL8cgcrFGDnW/9u0cWOQgLkxVLwwcWtkSIRjbAsUTPkMKW5rrBorDDvwwirNJDFk2M+0nmBbOqtcvhLI9dK+D8c8lrYerK0bOdeUnNOTjaK2ZVMN/3nP72VanU7X+FN33zbB953KI+xVRS5q5cEbip0Vy4qNrE0/bqCCU2J90RFgF+OZ/f1jWj/kHsM1A7PG9feqLbTsK/u/bAuzfKj8gLHMNZHRbTbe8lu/u1PhF1vNKUC35LkZ291fyTPfbMqNo+073ag36M59kv3HUteil3Z/eR4qoU315vNZvNvAAAA//8nXRw3kgoAAA
+      objectset.rio.cattle.io/id: ""
+      objectset.rio.cattle.io/owner-gvk: k3s.cattle.io/v1, Kind=Addon
+      objectset.rio.cattle.io/owner-name: coredns
+      objectset.rio.cattle.io/owner-namespace: kube-system
+    creationTimestamp: "2025-12-08T04:31:30Z"
+    generation: 1
+    labels:
+      k8s-app: kube-dns
+      kubernetes.io/name: CoreDNS
+      objectset.rio.cattle.io/hash: bce283298811743a0386ab510f2f67ef74240c57
+    name: coredns
+    namespace: kube-system
+    resourceVersion: "544"
+    uid: 86026601-5ae8-4546-bcb4-ef51bc0540e3
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 0
+    selector:
+      matchLabels:
+        k8s-app: kube-dns
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 1
+      type: RollingUpdate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          k8s-app: kube-dns
+      spec:
+        containers:
+        - args:
+          - -conf
+          - /etc/coredns/Corefile
+          image: rancher/mirrored-coredns-coredns:1.12.3
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: coredns
+          ports:
+          - containerPort: 53
+            name: dns
+            protocol: UDP
+          - containerPort: 53
+            name: dns-tcp
+            protocol: TCP
+          - containerPort: 9153
+            name: metrics
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ready
+              port: 8181
+              scheme: HTTP
+            periodSeconds: 2
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              memory: 170Mi
+            requests:
+              cpu: 100m
+              memory: 70Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              add:
+              - NET_BIND_SERVICE
+              drop:
+              - all
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /etc/coredns
+            name: config-volume
+            readOnly: true
+          - mountPath: /etc/coredns/custom
+            name: custom-config-volume
+            readOnly: true
+        dnsPolicy: Default
+        nodeSelector:
+          kubernetes.io/os: linux
+        priorityClassName: system-cluster-critical
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: coredns
+        serviceAccountName: coredns
+        terminationGracePeriodSeconds: 30
+        tolerations:
+        - key: CriticalAddonsOnly
+          operator: Exists
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+          operator: Exists
+        topologySpreadConstraints:
+        - labelSelector:
+            matchLabels:
+              k8s-app: kube-dns
+          maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+        - labelSelector:
+            matchLabels:
+              k8s-app: kube-dns
+          maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+        volumes:
+        - configMap:
+            defaultMode: 420
+            items:
+            - key: Corefile
+              path: Corefile
+            - key: NodeHosts
+              path: NodeHosts
+            name: coredns
+          name: config-volume
+        - configMap:
+            defaultMode: 420
+            name: coredns-custom
+            optional: true
+          name: custom-config-volume
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2025-12-08T04:31:33Z"
+      lastUpdateTime: "2025-12-08T04:31:33Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2025-12-08T04:31:33Z"
+      lastUpdateTime: "2025-12-08T04:31:42Z"
+      message: ReplicaSet "coredns-64fd4b4794" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      objectset.rio.cattle.io/applied: H4sIAAAAAAAA/6xUUW/iOBD+K6d5TgIcLUKR7gG1Pd1pW4padV8qtBqcCbg4tmUP2UYo/301BFqqLe2utE+J7ZnP38z3jbeAXn+lELWzkAN6H3v1ABJYa1tADpfkjWsqsgwJVMRYICPkW0BrHSNrZ6Ms3eKJFEfiLGiXKWQ2lGnX0wICyclz991SSJf1GnJYD+PRST1I/vqibfHPpCic/RTCYkWQg3EKTRrZBVzSLyVFj0oy15sFpbGJTBW0CRhckPmwtBXGFeQwGA/L4bkanZflQg37o7NRf1ieDcvB+bhfjNVojH8XuCjOBPQNSY+8Sn1wtZbmU4Du/ASf6EkJm0Bd/H9aimyudaUZ8n4CkQwpdkGCKmS1un6pAL0/fWsr4ByQadnsLnDGaLt88AUydWDPDxZr1AYXhiAftAlw44Xj3ZtY2afKm0PekVvMb3DZF6qcZdSWQoT8UZZVhWLJx9Pti4xBfJqmytlSLyGBHrHqdav9J3uKzsI8AbL1Dnkvyuz28tt0cnN1P5tcXEECNZoN/RtcJWRKTaa4o/Llf4Ys4h9qzF6Va9t2noCuxH85BLRqRaH3Pue87mf9bCjztkuYbYyZOaNVAzn8X04dzwLFbvg+807tzKaiG7ex3HWskt89z+M2vGJ1G2mXCe1ciFtX0P2RlcSGwRJT3I1NFArabp5FbR+0C5qbC4MxTjvMzrGpwKQqaNYKjUhDodaKJkoJq+lHtaT72BS7YEiAnaFweGwet7AmadDFHn73QMRbaxoZeC+Rwh2unnXkCG2yBSpLUgw5TN29WlGxMfI4dDA7qsEZyt7WKgYMzqTeoKU/ilxh5J1m70DOD0oebC8S3aAXLX62wN7n7WlJ27b9EQAA//8eX0Hn5AUAAA
+      objectset.rio.cattle.io/id: ""
+      objectset.rio.cattle.io/owner-gvk: k3s.cattle.io/v1, Kind=Addon
+      objectset.rio.cattle.io/owner-name: local-storage
+      objectset.rio.cattle.io/owner-namespace: kube-system
+    creationTimestamp: "2025-12-08T04:31:30Z"
+    generation: 1
+    labels:
+      objectset.rio.cattle.io/hash: 183f35c65ffbc3064603f43f1580d8c68a2dabd4
+    name: local-path-provisioner
+    namespace: kube-system
+    resourceVersion: "565"
+    uid: c81f64b9-ad00-4dac-a748-f72d859e5784
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 0
+    selector:
+      matchLabels:
+        app: local-path-provisioner
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 1
+      type: RollingUpdate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: local-path-provisioner
+      spec:
+        containers:
+        - command:
+          - local-path-provisioner
+          - start
+          - --config
+          - /etc/config/config.json
+          env:
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          image: rancher/local-path-provisioner:v0.0.31
+          imagePullPolicy: IfNotPresent
+          name: local-path-provisioner
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /etc/config/
+            name: config-volume
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          kubernetes.io/os: linux
+        priorityClassName: system-node-critical
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: local-path-provisioner-service-account
+        serviceAccountName: local-path-provisioner-service-account
+        terminationGracePeriodSeconds: 30
+        tolerations:
+        - key: CriticalAddonsOnly
+          operator: Exists
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+          operator: Exists
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: local-path-config
+          name: config-volume
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2025-12-08T04:31:33Z"
+      lastUpdateTime: "2025-12-08T04:31:33Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2025-12-08T04:31:33Z"
+      lastUpdateTime: "2025-12-08T04:31:43Z"
+      message: ReplicaSet "local-path-provisioner-774c6665dc" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      objectset.rio.cattle.io/applied: H4sIAAAAAAAA/6xV4W8auRP9V36az7vJLoEkXYkPiPAr1aUpKvROpypCxjuAD6/t88zScBH/+2l2k5RcStOr7gta7PHzm/fGM/eggvkVIxnvoAAVAp1uc0hgY1wJBVxhsH5XoWNIoEJWpWIFxT0o5zwrNt6R/PWLP1AzIZ9E40+0YrZ4YvypERBIju77Lw5jutpuoIDNGR3sbPPkf78YV/YHZendqxBOVQiFUIxGU0oYtxjT8pD+6wAUlBaUTb3AlHbEWME+AasWaJs0N5eUqhBeXPQd9LWiNRSAeYadbg/zM+yeq4tOT78py7LsLt/gonP2Zpl3Ly4uustS7vtmLtCuH6FIAbUQjLg14uXYEPu4uzaVYSiyBAgtavZRgirFen39elJ7AeaoGFe7Btxba9zqUygVYwt098mprTJWLSxCke8T4F0Qfh+fxco6VsE+njsopB8Q96gkB4lr71gZh5Gg+HwPKq7kA9JUY+S0NLF/ylWABNKUUNcR0+Aj9/Os08uaVRHUIqch4hJjxDJVZRmRKJWMqP/OMUan7LtJMrp7+hx74obbIURNmDpfYkqsuKbmpiagpZ9GJG9reTv9vEfNDltKtQlrjCnVhpH6s+vpfDS8Go/kdzqY//ZuNp4PRtN5p3c+fzt8P5+OB2eX3eRr3McfivoHWt65fIzr9M6PoR2NOkAbjgfD8aCTzScfrn/Pz7Let8BeBMFtAqZSK3E3KqfXGE8rE6MXB57bXWyzk8sTccuaLTokmkS/aApqqYytI87WEWntbQnFWQJr5vAWWfaDYnmEp3LwL0igcaRoIkR/0mts6ms8m02mUlbGGTbKXqFVuylq70qC4jxLIGA0vnxayuVp1Voj0cHleQJsKvQ1fw38zrsWNm3ZPlXxpCHYVOfTuUe2IXr22lsoYDacwP42gYiqND+liJzc/bwkLxXp/AtB5CHUUSO1revPGombbx1qKCDPsqoZO5WPOyjgIntv2qYkL9jwbugd412Tj7LWf5lEszUWVzgirWwznaBYKkvYSvTB2d1H7/n/xuJD7yw41rJbuwHdeCe7z9Y+EUYxIsv2CWy9rSt872v34Fcln5MHKdv+8mAWV0G6DuxvxR/pBtODDiydIjpkpGYAERRgjavvROcQjW+Ss4ropkVrybZNRUfDRisrJmHcGo0DrYXHzZHyYm8xPo7qz/ewQRFz+ADTjFcSZWSIBYkUjjC6M2LGPrkHXC5RS3Hc+KleY1lb6XctTEMpeosnz3OSSo7epsEqh/8pcqWI24n7EvL20aM2U6wC766MSL7/ljP7/f7vAAAA//93ZXtQAQkAAA
+      objectset.rio.cattle.io/id: ""
+      objectset.rio.cattle.io/owner-gvk: k3s.cattle.io/v1, Kind=Addon
+      objectset.rio.cattle.io/owner-name: metrics-server-deployment
+      objectset.rio.cattle.io/owner-namespace: kube-system
+    creationTimestamp: "2025-12-08T04:31:30Z"
+    generation: 1
+    labels:
+      k8s-app: metrics-server
+      objectset.rio.cattle.io/hash: e10e245e13e46a725c9dddd4f9eb239f147774fd
+    name: metrics-server
+    namespace: kube-system
+    resourceVersion: "737"
+    uid: 14094c32-825d-4e7f-84d2-5caa0663811c
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 0
+    selector:
+      matchLabels:
+        k8s-app: metrics-server
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 1
+      type: RollingUpdate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          k8s-app: metrics-server
+        name: metrics-server
+      spec:
+        containers:
+        - args:
+          - --cert-dir=/tmp
+          - --secure-port=10250
+          - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
+          - --kubelet-use-node-status-port
+          - --metric-resolution=15s
+          - --tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305
+          image: rancher/mirrored-metrics-server:v0.8.0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /livez
+              port: https
+              scheme: HTTPS
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: metrics-server
+          ports:
+          - containerPort: 10250
+            name: https
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /readyz
+              port: https
+              scheme: HTTPS
+            periodSeconds: 2
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            requests:
+              cpu: 100m
+              memory: 70Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /tmp
+            name: tmp-dir
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          kubernetes.io/os: linux
+        priorityClassName: system-node-critical
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: metrics-server
+        serviceAccountName: metrics-server
+        terminationGracePeriodSeconds: 30
+        tolerations:
+        - key: CriticalAddonsOnly
+          operator: Exists
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+          operator: Exists
+        volumes:
+        - emptyDir: {}
+          name: tmp-dir
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2025-12-08T04:31:33Z"
+      lastUpdateTime: "2025-12-08T04:31:33Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2025-12-08T04:31:33Z"
+      lastUpdateTime: "2025-12-08T04:31:59Z"
+      message: ReplicaSet "metrics-server-7bfffcd44" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      meta.helm.sh/release-name: traefik
+      meta.helm.sh/release-namespace: kube-system
+    creationTimestamp: "2025-12-08T04:32:01Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/instance: traefik-kube-system
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: traefik
+      helm.sh/chart: traefik-34.2.1_up34.2.0
+    name: traefik
+    namespace: kube-system
+    resourceVersion: "867"
+    uid: 4ebf40d4-6ea0-4040-802f-6e9dad29e127
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/instance: traefik-kube-system
+        app.kubernetes.io/name: traefik
+    strategy:
+      rollingUpdate:
+        maxSurge: 1
+        maxUnavailable: 0
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          prometheus.io/path: /metrics
+          prometheus.io/port: "9100"
+          prometheus.io/scrape: "true"
+        creationTimestamp: null
+        labels:
+          app.kubernetes.io/instance: traefik-kube-system
+          app.kubernetes.io/managed-by: Helm
+          app.kubernetes.io/name: traefik
+          helm.sh/chart: traefik-34.2.1_up34.2.0
+      spec:
+        automountServiceAccountToken: true
+        containers:
+        - args:
+          - --global.checknewversion
+          - --global.sendanonymoususage
+          - --entryPoints.metrics.address=:9100/tcp
+          - --entryPoints.traefik.address=:8080/tcp
+          - --entryPoints.web.address=:8000/tcp
+          - --entryPoints.websecure.address=:8443/tcp
+          - --api.dashboard=true
+          - --ping=true
+          - --metrics.prometheus=true
+          - --metrics.prometheus.entrypoint=metrics
+          - --providers.kubernetescrd
+          - --providers.kubernetescrd.allowEmptyServices=true
+          - --providers.kubernetesingress
+          - --providers.kubernetesingress.allowEmptyServices=true
+          - --providers.kubernetesingress.ingressendpoint.publishedservice=kube-system/traefik
+          - --entryPoints.websecure.http.tls=true
+          - --log.level=INFO
+          env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          image: rancher/mirrored-library-traefik:3.3.6
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ping
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 2
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 2
+          name: traefik
+          ports:
+          - containerPort: 9100
+            name: metrics
+            protocol: TCP
+          - containerPort: 8080
+            name: traefik
+            protocol: TCP
+          - containerPort: 8000
+            name: web
+            protocol: TCP
+          - containerPort: 8443
+            name: websecure
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 1
+            httpGet:
+              path: /ping
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 2
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 2
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data
+            name: data
+          - mountPath: /tmp
+            name: tmp
+        dnsPolicy: ClusterFirst
+        priorityClassName: system-cluster-critical
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          runAsGroup: 65532
+          runAsNonRoot: true
+          runAsUser: 65532
+        serviceAccount: traefik
+        serviceAccountName: traefik
+        terminationGracePeriodSeconds: 60
+        tolerations:
+        - key: CriticalAddonsOnly
+          operator: Exists
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+          operator: Exists
+        volumes:
+        - emptyDir: {}
+          name: data
+        - emptyDir: {}
+          name: tmp
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2025-12-08T04:32:17Z"
+      lastUpdateTime: "2025-12-08T04:32:17Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2025-12-08T04:32:01Z"
+      lastUpdateTime: "2025-12-08T04:32:17Z"
+      message: ReplicaSet "traefik-c98fdf6fb" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "1"
+      objectset.rio.cattle.io/applied: H4sIAAAAAAAA/6xV3W7bOBN9lQ9zLcVW3DaugO+iG2e3RVuvUSe9KYKCpkYW1xSHS46caAO/+2Ik27Hb/LSLXtkiZ4bnnPm7A+XNZwzRkIMclPdxsM4ggZVxBeQwQW+prdExJFAjq0KxgvwOlHPEig25KJ+0+As1R+STYOhEK2aLJ4YGRoJA8ug93TgM6XK9ghxWo3hws86S/703rvj/m6Ig92wIp2qEHDQFLFz8IfPolRafVbPANLaRsYZNAlYt0HakVuOYKu93Jn1c+RscMkaJtn32nAJOpvMnnq1UrCCHhcbT8ej09XicZWcvRmo4Gr9Si5fZsDwtX51hefbi9MVQvzwTIN9RegJ09KgFcsC1kVy+NZEptB9MbRjyYQIRLWqmIEa1Yl19eIrmRkJyUIzLtgtL1hq3vPKFYuxD3F45tVbGqoVFyLNNAtx6QfbpyFbOsfZ253dQQk8KvTkgpcmxMg5DhPzLHaiwlD+QanIlJDBA1oOtSgPJRGkswnUCplZLQRSU0xWGQW1CELN0a7z7zbOT7PRkBFuPWWPtjKzRLeTwrpwSzwLGvgWsWaPDGGeBFh2hUhnbBLysAsaKbAH5KIGK2f+BLPdeseR9UKGyXEECngJDPh6OJSm6wi7Hby8vZyKVcYaNshO0qp2jJldEyF8NE/AYDBX7o0ycG60xxoOXswTY1EgN3xs+VEcCoZdyr+ysQ/VytLfeWgZi0mQhh6uJIHzGJWXtj90uzx90e50dONbIwej4gON1AgFVYf6T5OLZ3iuejbMfVfx7wU9/Qu+AkZqgsSttKx0Y+9KvKUhJZWfDjwY6w78bjP2t9o1cDYd1N2i3pr2ltALqJhhuz8kx3nY0lbV0MwtmbSwu8SJqZbt5DHmpbMQEtPJqYaxh00NRRSFtM724/Prbu+nk6/zi0+d35xfSKUUgL3fKWrje9KL/6Wz7iYh/Nxa3gybn0OAmgTXZpsaP1LhtHdXyd7bV/aAd4aD6XGmWae8J9y/sYj4eY6CbyFQfhOq+02ciXkvxFC7uO3mCpWqsNLGjAucH8/B4pFOEHKxxza3kyAdDnfBWxTjtAfRqpNo2kTGkOhg2WlmQNIW10fhGayEz/bbxmCyG3dL8cgcrFGDnW/9u0cWOQgLkxVLwwcWtkSIRjbAsUTPkMKW5rrBorDDvwwirNJDFk2M+0nmBbOqtcvhLI9dK+D8c8lrYerK0bOdeUnNOTjaK2ZVMN/3nP72VanU7X+FN33zbB953KI+xVRS5q5cEbip0Vy4qNrE0/bqCCU2J90RFgF+OZ/f1jWj/kHsM1A7PG9feqLbTsK/u/bAuzfKj8gLHMNZHRbTbe8lu/u1PhF1vNKUC35LkZ291fyTPfbMqNo+073ag36M59kv3HUteil3Z/eR4qoU315vNZvNvAAAA//8nXRw3kgoAAA
+      objectset.rio.cattle.io/id: ""
+      objectset.rio.cattle.io/owner-gvk: k3s.cattle.io/v1, Kind=Addon
+      objectset.rio.cattle.io/owner-name: coredns
+      objectset.rio.cattle.io/owner-namespace: kube-system
+    creationTimestamp: "2025-12-08T04:31:33Z"
+    generation: 1
+    labels:
+      k8s-app: kube-dns
+      pod-template-hash: 64fd4b4794
+    name: coredns-64fd4b4794
+    namespace: kube-system
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: coredns
+      uid: 86026601-5ae8-4546-bcb4-ef51bc0540e3
+    resourceVersion: "543"
+    uid: 6eeab5ed-abbc-401f-92b6-83412df30e1c
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        k8s-app: kube-dns
+        pod-template-hash: 64fd4b4794
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          k8s-app: kube-dns
+          pod-template-hash: 64fd4b4794
+      spec:
+        containers:
+        - args:
+          - -conf
+          - /etc/coredns/Corefile
+          image: rancher/mirrored-coredns-coredns:1.12.3
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: coredns
+          ports:
+          - containerPort: 53
+            name: dns
+            protocol: UDP
+          - containerPort: 53
+            name: dns-tcp
+            protocol: TCP
+          - containerPort: 9153
+            name: metrics
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ready
+              port: 8181
+              scheme: HTTP
+            periodSeconds: 2
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              memory: 170Mi
+            requests:
+              cpu: 100m
+              memory: 70Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              add:
+              - NET_BIND_SERVICE
+              drop:
+              - all
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /etc/coredns
+            name: config-volume
+            readOnly: true
+          - mountPath: /etc/coredns/custom
+            name: custom-config-volume
+            readOnly: true
+        dnsPolicy: Default
+        nodeSelector:
+          kubernetes.io/os: linux
+        priorityClassName: system-cluster-critical
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: coredns
+        serviceAccountName: coredns
+        terminationGracePeriodSeconds: 30
+        tolerations:
+        - key: CriticalAddonsOnly
+          operator: Exists
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+          operator: Exists
+        topologySpreadConstraints:
+        - labelSelector:
+            matchLabels:
+              k8s-app: kube-dns
+          maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+        - labelSelector:
+            matchLabels:
+              k8s-app: kube-dns
+          maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+        volumes:
+        - configMap:
+            defaultMode: 420
+            items:
+            - key: Corefile
+              path: Corefile
+            - key: NodeHosts
+              path: NodeHosts
+            name: coredns
+          name: config-volume
+        - configMap:
+            defaultMode: 420
+            name: coredns-custom
+            optional: true
+          name: custom-config-volume
+  status:
+    availableReplicas: 1
+    fullyLabeledReplicas: 1
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "1"
+      objectset.rio.cattle.io/applied: H4sIAAAAAAAA/6xUUW/iOBD+K6d5TgIcLUKR7gG1Pd1pW4padV8qtBqcCbg4tmUP2UYo/301BFqqLe2utE+J7ZnP38z3jbeAXn+lELWzkAN6H3v1ABJYa1tADpfkjWsqsgwJVMRYICPkW0BrHSNrZ6Ms3eKJFEfiLGiXKWQ2lGnX0wICyclz991SSJf1GnJYD+PRST1I/vqibfHPpCic/RTCYkWQg3EKTRrZBVzSLyVFj0oy15sFpbGJTBW0CRhckPmwtBXGFeQwGA/L4bkanZflQg37o7NRf1ieDcvB+bhfjNVojH8XuCjOBPQNSY+8Sn1wtZbmU4Du/ASf6EkJm0Bd/H9aimyudaUZ8n4CkQwpdkGCKmS1un6pAL0/fWsr4ByQadnsLnDGaLt88AUydWDPDxZr1AYXhiAftAlw44Xj3ZtY2afKm0PekVvMb3DZF6qcZdSWQoT8UZZVhWLJx9Pti4xBfJqmytlSLyGBHrHqdav9J3uKzsI8AbL1Dnkvyuz28tt0cnN1P5tcXEECNZoN/RtcJWRKTaa4o/Llf4Ys4h9qzF6Va9t2noCuxH85BLRqRaH3Pue87mf9bCjztkuYbYyZOaNVAzn8X04dzwLFbvg+807tzKaiG7ex3HWskt89z+M2vGJ1G2mXCe1ciFtX0P2RlcSGwRJT3I1NFArabp5FbR+0C5qbC4MxTjvMzrGpwKQqaNYKjUhDodaKJkoJq+lHtaT72BS7YEiAnaFweGwet7AmadDFHn73QMRbaxoZeC+Rwh2unnXkCG2yBSpLUgw5TN29WlGxMfI4dDA7qsEZyt7WKgYMzqTeoKU/ilxh5J1m70DOD0oebC8S3aAXLX62wN7n7WlJ27b9EQAA//8eX0Hn5AUAAA
+      objectset.rio.cattle.io/id: ""
+      objectset.rio.cattle.io/owner-gvk: k3s.cattle.io/v1, Kind=Addon
+      objectset.rio.cattle.io/owner-name: local-storage
+      objectset.rio.cattle.io/owner-namespace: kube-system
+    creationTimestamp: "2025-12-08T04:31:33Z"
+    generation: 1
+    labels:
+      app: local-path-provisioner
+      pod-template-hash: 774c6665dc
+    name: local-path-provisioner-774c6665dc
+    namespace: kube-system
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: local-path-provisioner
+      uid: c81f64b9-ad00-4dac-a748-f72d859e5784
+    resourceVersion: "564"
+    uid: 12380e86-0aaa-497e-9e04-705e06377263
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: local-path-provisioner
+        pod-template-hash: 774c6665dc
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: local-path-provisioner
+          pod-template-hash: 774c6665dc
+      spec:
+        containers:
+        - command:
+          - local-path-provisioner
+          - start
+          - --config
+          - /etc/config/config.json
+          env:
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          image: rancher/local-path-provisioner:v0.0.31
+          imagePullPolicy: IfNotPresent
+          name: local-path-provisioner
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /etc/config/
+            name: config-volume
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          kubernetes.io/os: linux
+        priorityClassName: system-node-critical
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: local-path-provisioner-service-account
+        serviceAccountName: local-path-provisioner-service-account
+        terminationGracePeriodSeconds: 30
+        tolerations:
+        - key: CriticalAddonsOnly
+          operator: Exists
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+          operator: Exists
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: local-path-config
+          name: config-volume
+  status:
+    availableReplicas: 1
+    fullyLabeledReplicas: 1
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "1"
+      objectset.rio.cattle.io/applied: H4sIAAAAAAAA/6xV4W8auRP9V36az7vJLoEkXYkPiPAr1aUpKvROpypCxjuAD6/t88zScBH/+2l2k5RcStOr7gta7PHzm/fGM/eggvkVIxnvoAAVAp1uc0hgY1wJBVxhsH5XoWNIoEJWpWIFxT0o5zwrNt6R/PWLP1AzIZ9E40+0YrZ4YvypERBIju77Lw5jutpuoIDNGR3sbPPkf78YV/YHZendqxBOVQiFUIxGU0oYtxjT8pD+6wAUlBaUTb3AlHbEWME+AasWaJs0N5eUqhBeXPQd9LWiNRSAeYadbg/zM+yeq4tOT78py7LsLt/gonP2Zpl3Ly4uustS7vtmLtCuH6FIAbUQjLg14uXYEPu4uzaVYSiyBAgtavZRgirFen39elJ7AeaoGFe7Btxba9zqUygVYwt098mprTJWLSxCke8T4F0Qfh+fxco6VsE+njsopB8Q96gkB4lr71gZh5Gg+HwPKq7kA9JUY+S0NLF/ylWABNKUUNcR0+Aj9/Os08uaVRHUIqch4hJjxDJVZRmRKJWMqP/OMUan7LtJMrp7+hx74obbIURNmDpfYkqsuKbmpiagpZ9GJG9reTv9vEfNDltKtQlrjCnVhpH6s+vpfDS8Go/kdzqY//ZuNp4PRtN5p3c+fzt8P5+OB2eX3eRr3McfivoHWt65fIzr9M6PoR2NOkAbjgfD8aCTzScfrn/Pz7Let8BeBMFtAqZSK3E3KqfXGE8rE6MXB57bXWyzk8sTccuaLTokmkS/aApqqYytI87WEWntbQnFWQJr5vAWWfaDYnmEp3LwL0igcaRoIkR/0mts6ms8m02mUlbGGTbKXqFVuylq70qC4jxLIGA0vnxayuVp1Voj0cHleQJsKvQ1fw38zrsWNm3ZPlXxpCHYVOfTuUe2IXr22lsoYDacwP42gYiqND+liJzc/bwkLxXp/AtB5CHUUSO1revPGombbx1qKCDPsqoZO5WPOyjgIntv2qYkL9jwbugd412Tj7LWf5lEszUWVzgirWwznaBYKkvYSvTB2d1H7/n/xuJD7yw41rJbuwHdeCe7z9Y+EUYxIsv2CWy9rSt872v34Fcln5MHKdv+8mAWV0G6DuxvxR/pBtODDiydIjpkpGYAERRgjavvROcQjW+Ss4ropkVrybZNRUfDRisrJmHcGo0DrYXHzZHyYm8xPo7qz/ewQRFz+ADTjFcSZWSIBYkUjjC6M2LGPrkHXC5RS3Hc+KleY1lb6XctTEMpeosnz3OSSo7epsEqh/8pcqWI24n7EvL20aM2U6wC766MSL7/ljP7/f7vAAAA//93ZXtQAQkAAA
+      objectset.rio.cattle.io/id: ""
+      objectset.rio.cattle.io/owner-gvk: k3s.cattle.io/v1, Kind=Addon
+      objectset.rio.cattle.io/owner-name: metrics-server-deployment
+      objectset.rio.cattle.io/owner-namespace: kube-system
+    creationTimestamp: "2025-12-08T04:31:33Z"
+    generation: 1
+    labels:
+      k8s-app: metrics-server
+      pod-template-hash: 7bfffcd44
+    name: metrics-server-7bfffcd44
+    namespace: kube-system
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: metrics-server
+      uid: 14094c32-825d-4e7f-84d2-5caa0663811c
+    resourceVersion: "736"
+    uid: 4796a484-6b8e-471f-8cc2-45c8369c75c5
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        k8s-app: metrics-server
+        pod-template-hash: 7bfffcd44
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          k8s-app: metrics-server
+          pod-template-hash: 7bfffcd44
+        name: metrics-server
+      spec:
+        containers:
+        - args:
+          - --cert-dir=/tmp
+          - --secure-port=10250
+          - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
+          - --kubelet-use-node-status-port
+          - --metric-resolution=15s
+          - --tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305
+          image: rancher/mirrored-metrics-server:v0.8.0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /livez
+              port: https
+              scheme: HTTPS
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: metrics-server
+          ports:
+          - containerPort: 10250
+            name: https
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /readyz
+              port: https
+              scheme: HTTPS
+            periodSeconds: 2
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            requests:
+              cpu: 100m
+              memory: 70Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /tmp
+            name: tmp-dir
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          kubernetes.io/os: linux
+        priorityClassName: system-node-critical
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        serviceAccount: metrics-server
+        serviceAccountName: metrics-server
+        terminationGracePeriodSeconds: 30
+        tolerations:
+        - key: CriticalAddonsOnly
+          operator: Exists
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+          operator: Exists
+        volumes:
+        - emptyDir: {}
+          name: tmp-dir
+  status:
+    availableReplicas: 1
+    fullyLabeledReplicas: 1
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "1"
+      meta.helm.sh/release-name: traefik
+      meta.helm.sh/release-namespace: kube-system
+    creationTimestamp: "2025-12-08T04:32:01Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/instance: traefik-kube-system
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: traefik
+      helm.sh/chart: traefik-34.2.1_up34.2.0
+      pod-template-hash: c98fdf6fb
+    name: traefik-c98fdf6fb
+    namespace: kube-system
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: traefik
+      uid: 4ebf40d4-6ea0-4040-802f-6e9dad29e127
+    resourceVersion: "866"
+    uid: 3f697b49-2af0-42ee-9360-4030806bff11
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app.kubernetes.io/instance: traefik-kube-system
+        app.kubernetes.io/name: traefik
+        pod-template-hash: c98fdf6fb
+    template:
+      metadata:
+        annotations:
+          prometheus.io/path: /metrics
+          prometheus.io/port: "9100"
+          prometheus.io/scrape: "true"
+        creationTimestamp: null
+        labels:
+          app.kubernetes.io/instance: traefik-kube-system
+          app.kubernetes.io/managed-by: Helm
+          app.kubernetes.io/name: traefik
+          helm.sh/chart: traefik-34.2.1_up34.2.0
+          pod-template-hash: c98fdf6fb
+      spec:
+        automountServiceAccountToken: true
+        containers:
+        - args:
+          - --global.checknewversion
+          - --global.sendanonymoususage
+          - --entryPoints.metrics.address=:9100/tcp
+          - --entryPoints.traefik.address=:8080/tcp
+          - --entryPoints.web.address=:8000/tcp
+          - --entryPoints.websecure.address=:8443/tcp
+          - --api.dashboard=true
+          - --ping=true
+          - --metrics.prometheus=true
+          - --metrics.prometheus.entrypoint=metrics
+          - --providers.kubernetescrd
+          - --providers.kubernetescrd.allowEmptyServices=true
+          - --providers.kubernetesingress
+          - --providers.kubernetesingress.allowEmptyServices=true
+          - --providers.kubernetesingress.ingressendpoint.publishedservice=kube-system/traefik
+          - --entryPoints.websecure.http.tls=true
+          - --log.level=INFO
+          env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          image: rancher/mirrored-library-traefik:3.3.6
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ping
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 2
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 2
+          name: traefik
+          ports:
+          - containerPort: 9100
+            name: metrics
+            protocol: TCP
+          - containerPort: 8080
+            name: traefik
+            protocol: TCP
+          - containerPort: 8000
+            name: web
+            protocol: TCP
+          - containerPort: 8443
+            name: websecure
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 1
+            httpGet:
+              path: /ping
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 2
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 2
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data
+            name: data
+          - mountPath: /tmp
+            name: tmp
+        dnsPolicy: ClusterFirst
+        priorityClassName: system-cluster-critical
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          runAsGroup: 65532
+          runAsNonRoot: true
+          runAsUser: 65532
+        serviceAccount: traefik
+        serviceAccountName: traefik
+        terminationGracePeriodSeconds: 60
+        tolerations:
+        - key: CriticalAddonsOnly
+          operator: Exists
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+          operator: Exists
+        volumes:
+        - emptyDir: {}
+          name: data
+        - emptyDir: {}
+          name: tmp
+  status:
+    availableReplicas: 1
+    fullyLabeledReplicas: 1
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+- apiVersion: batch/v1
+  kind: Job
+  metadata:
+    annotations:
+      objectset.rio.cattle.io/applied: H4sIAAAAAAAA/6xWUW/ivBL9K1eW9ukmIYFCINI+pDTccpdCBGx1r1YVMmYC/nDsyHbYRRX//ZOdtISl2+1K3xtx5pzMzDkz5hnhgj6CVFRwFKE11mTXOgTIQXvKNyhC/xVr5KAcNN5gjVH0jDDnQmNNBVfmUaz/AqIVaE9S4RGsNQOPihY16B2w3CWCaykYA+mSHZbalbClSkvLgZxfMojvHKS7PexrosarQ+D86wvlm8/3wPKhIf0tD8c5oAhpiSGj+w+FqwITg9mXa3DVUWnI0clBRIJNfUlzUBrnBYp4yZiDGF4Ds00x6dpalfdT5vb0Q3nssNqhCBE/G4SAQ9zuQmcDJAwG3ZCEuNO+CXCnn3Wgm2HoZiazukbbdcqVxoy55w/9qiQH2ZLnkIEETkCh6NtPvrhqP3LQmgmynxnkHTCwWkYZZgocdFb89ai2U1OvK0VK6xncXuN13++5fdiE7k2/03MHOCNuNuh3ww0Jbrq9Pjo9nRykCiCm22tM9iLLJjSnGkWB7/sO0pAXDGsw799x7ztCCZ7R7X0lwuI+bnd7n/thEMbddtLrBmEQ3nZv/WQ0GA5u+72b3rA7GvrBMLiL/VF41xn1Rslt3GkHo2E3HP3jtjk1yjfdxpSDrIWTW/MD1QZADnJdBdpVWlK+RQ7aMrHGzKvUv4MMl0zPq5E8fkZPDgJ+sEy1QNP4IUEOOmBWNvU6Oa8Rj8l8MZ5Nm0fzJJ01n++TycPqbj5+TOYNLgVEgm7GDe/j+XJlPrlI42Hzu5dTeAlohO20LlTUan16/vL1NplPk2WyWMXp+PSppYzwpOqlatV1uJ0br+0F/y4L+8O/SvqN4pbx/D/JH2UZf13er9J4sVgN58ldMl2O48miAbNT0gSMp4tk+HWerBZfxulqOVmYPMaj/7+HSSfxeLq6Xy7T96Kms1U6n/2vyeSpA3E8wkqlQXpMEMycwPdu2p7v+a2gZx869UOTaxSPJybJdDYZD5uMEl7sd3pyEM3x1p5iTnYgW3tGiwKka0weHXxv4PXddUnZpu23u37oD1CNSUvGUsEoOZqWZFOhUwkKeGN9GA7kIAlKlNIur2czG0BKSfVxKLiGH9pOPmPieyrpgTLYQqIIZvhya+ECrymjmloWtJGiMIMUTybIrBsJeDPj7DgXQo8og1rlSMsSTg46CFbm8CBKrqtBzM3PFGuzQFo7kcNF3S2vzryuo/nOtvh3cILJDq7x1fGHCOyGe4OhOr+i0HnR2Np5cR3xM6N1g3oj7vIGMAvMaHp6MmbhYgMLYEC0kEYGM1GSgwZlb2eFIsQoL38gK4nSWOpXi8z4CFNWStOXNywgSx6rqeBGwUo3G0ZEXqRSZJTZ60IfC7vBSq5pDvWCrDYuyAMlEBNiqpk2btvzJVbZoHIA5IU+3lFZXUIbWuYoQg+QC3lsXNdXyv8Z7Cz4H+LOMn8M+CL5pbgOKqQw/2BgY+CvU/jt+WW7R8+Iasirsz0cm38DHi3JsDaAg4rKIRW367u+77uvwe5FtHfEebVeXmxkY2ro+aJ8Opmkq2ofcGHSuQDU7jsj3vKlVV9jXdr9cvo7AAD//6u5Zpo3CwAA
+      objectset.rio.cattle.io/id: helm-controller-chart-registration
+      objectset.rio.cattle.io/owner-gvk: helm.cattle.io/v1, Kind=HelmChart
+      objectset.rio.cattle.io/owner-name: traefik
+      objectset.rio.cattle.io/owner-namespace: kube-system
+    creationTimestamp: "2025-12-08T04:31:30Z"
+    generation: 1
+    labels:
+      helmcharts.helm.cattle.io/chart: traefik
+      objectset.rio.cattle.io/hash: c0f97ea7a25e3dec71957c7a3241a38f3e5fae5f
+    name: helm-install-traefik
+    namespace: kube-system
+    ownerReferences:
+    - apiVersion: helm.cattle.io/v1
+      blockOwnerDeletion: false
+      controller: false
+      kind: HelmChart
+      name: traefik
+      uid: a2bab806-8ed7-4836-9afc-f9857dc14568
+    resourceVersion: "814"
+    uid: aec600ce-42e0-4561-bcfa-38c7c44c609c
+  spec:
+    backoffLimit: 1000
+    completionMode: NonIndexed
+    completions: 1
+    manualSelector: false
+    parallelism: 1
+    podReplacementPolicy: TerminatingOrFailed
+    selector:
+      matchLabels:
+        batch.kubernetes.io/controller-uid: aec600ce-42e0-4561-bcfa-38c7c44c609c
+    suspend: false
+    template:
+      metadata:
+        annotations:
+          helmcharts.helm.cattle.io/configHash: SHA256=8717A52E651717B5B0EF9C9B8646C5FC01C1DA0F7D3F6FEBA321FC57FE9A012A
+        creationTimestamp: null
+        labels:
+          batch.kubernetes.io/controller-uid: aec600ce-42e0-4561-bcfa-38c7c44c609c
+          batch.kubernetes.io/job-name: helm-install-traefik
+          controller-uid: aec600ce-42e0-4561-bcfa-38c7c44c609c
+          helmcharts.helm.cattle.io/chart: traefik
+          job-name: helm-install-traefik
+      spec:
+        containers:
+        - args:
+          - install
+          - --set-string
+          - global.systemDefaultRegistry=
+          env:
+          - name: NAME
+            value: traefik
+          - name: VERSION
+          - name: REPO
+          - name: HELM_DRIVER
+            value: secret
+          - name: CHART_NAMESPACE
+            value: kube-system
+          - name: CHART
+            value: https://%{KUBERNETES_API}%/static/charts/traefik-34.2.1+up34.2.0.tgz
+          - name: HELM_VERSION
+          - name: TARGET_NAMESPACE
+            value: kube-system
+          - name: AUTH_PASS_CREDENTIALS
+            value: "false"
+          - name: INSECURE_SKIP_TLS_VERIFY
+            value: "false"
+          - name: PLAIN_HTTP
+            value: "false"
+          - name: NO_PROXY
+            value: .svc,.cluster.local,10.42.0.0/16,10.43.0.0/16
+          - name: FAILURE_POLICY
+            value: reinstall
+          image: rancher/klipper-helm:v0.9.8-build20250709
+          imagePullPolicy: IfNotPresent
+          name: helm
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /home/klipper-helm/.helm
+            name: klipper-helm
+          - mountPath: /home/klipper-helm/.cache
+            name: klipper-cache
+          - mountPath: /home/klipper-helm/.config
+            name: klipper-config
+          - mountPath: /tmp
+            name: tmp
+          - mountPath: /config
+            name: values
+          - mountPath: /chart
+            name: content
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          kubernetes.io/os: linux
+        restartPolicy: OnFailure
+        schedulerName: default-scheduler
+        securityContext:
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+        serviceAccount: helm-traefik
+        serviceAccountName: helm-traefik
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir:
+            medium: Memory
+          name: klipper-helm
+        - emptyDir:
+            medium: Memory
+          name: klipper-cache
+        - emptyDir:
+            medium: Memory
+          name: klipper-config
+        - emptyDir:
+            medium: Memory
+          name: tmp
+        - name: values
+          projected:
+            defaultMode: 420
+            sources:
+            - secret:
+                items:
+                - key: HelmChartValuesContent
+                  path: values-0-000-HelmChart-ValuesContent.yaml
+                name: chart-values-traefik
+        - configMap:
+            defaultMode: 420
+            name: chart-content-traefik
+          name: content
+  status:
+    completionTime: "2025-12-08T04:32:04Z"
+    conditions:
+    - lastProbeTime: "2025-12-08T04:32:04Z"
+      lastTransitionTime: "2025-12-08T04:32:04Z"
+      message: Reached expected number of succeeded pods
+      reason: CompletionsReached
+      status: "True"
+      type: SuccessCriteriaMet
+    - lastProbeTime: "2025-12-08T04:32:04Z"
+      lastTransitionTime: "2025-12-08T04:32:04Z"
+      message: Reached expected number of succeeded pods
+      reason: CompletionsReached
+      status: "True"
+      type: Complete
+    ready: 0
+    startTime: "2025-12-08T04:31:32Z"
+    succeeded: 1
+    terminating: 0
+    uncountedTerminatedPods: {}
+- apiVersion: batch/v1
+  kind: Job
+  metadata:
+    annotations:
+      objectset.rio.cattle.io/applied: H4sIAAAAAAAA/7RWX4/auBf9Kj9Z6tMvCSEEmETqQ4YJC1sGIqDVrqoRMuZm8OLYke3QohHffWWHTsNApzMP+4b/nJN77zm+lyeES/oFpKKCoxitsSbb1r6NHLSjfINi9KdYIwcVoPEGa4ziJ4Q5FxprKrgyS7H+B4hWoD1JhUew1gw8KlrUoLfACpcIrqVgDKRLtlhqV8IjVVpaDuT8kkF84yDdx/3uRNQ42red/32ifPNxBKwYGNLf8nBcAIqRlhhyunOJ3LwJokpMDG5XrcFVB6WhQEcHEQk2/CUtQGlclCjmFWMOYngNzBbGhGzzVd6L6O3um2PZYrVFMQpv8ryz6ZJOu91fd/pBTjYEd/2oH3XzKA/6foBzvxsFJrpTrrb6lCuNGXPPP/ar1BxkU59DDhI4AYXiry88ciEFctCaCbKbGeQdMLC6xjlmChz0U/3nrZO1mtpdVaeyHgp7QdfvdLHb7eWBG/ohuNiPem7f7+EwCtb9bqePjg9HB6kSiKn8GpOdyPMJLahGcdv3fQdpKEqGNZjzV9z8imiC5/RxVIuxGCVBt/cx7dz6gzAMopvhoD1oh1EyvB2Gg5so6g1voyAM+kkattOwF0a3USccJGHUjaL2bf8/sdCxUQJTdUw5yJOA8tH8QCczoAcHAd/bo1Plp8l9ihy0x6x6KcTReb71JZ0vxrNpc2ueZrPmepRO7ld38/GXdN7gU0Ak6Oa9wSiZL1fms4ssGTS/ff7UzgGNa1utSxW3Wh+ePn2+TefTdJkuVkk2Pn5oKaMoqYukWo1c3E7oBV77/1XZCS+CvpLcMpn/kb4ryuTzcrTKksViNZind+l0OU4miwbMPoEmYDxdpIPP83S1+DTOVsvJwsQxHv79GiabJOPparRcZq/dms5W2Xz2V5PJU3vieIRVSoP0mCCYOW3fCwPP9/xWu2cXndOiyTVMxhMTZDabjAdNRgk/PHV8cBAt8KPdxZxsQbZ2jJYlSNe4N977XuTduOuKsk3gB12/70fohMkqxjLBKDmYkuRToTMJCnijNxgO5CAJSlTSdqYnY3gglaT6MBBcw3dtnzRj4lsm6Z4yeIRUEczweUvCJV5TRjW1LGgjRWleRzKZINNHJODNjLPDXAg9pAxOKsdaVnB00F6wqoB7UXFdv67C/MywNp2htRUFnOXd8k6Rn/JontkS/w5OMNnCJb7efhOBbV1XGOr9CwpdlI2WXJSXN14yWjeoK/fO27vpSkbT44MxCxcbWAADooU0MpgXJTloUHYEKxQjRnn1HVlJlMZSP1tkxoeYskqaulyxgKx4oqaCGwVr3ew1IooykyKnzM4BfShtB6u4pgXcQY4rpus2CnJPCSSEmGymjXF6PqFqK9QugKLUhzsq6wmzoVWBYnQPhZCHxky+UP99sJ+ivxP3U+q3AX/Ifi6wg0opzN8U2Bj480v8+vSjw8fPkPq/Xg10z+fUw9FQ1zHd4/ICdPLJOeqai6xWGuvKdoPjvwEAAP//FZQWgs4KAAA
+      objectset.rio.cattle.io/id: helm-controller-chart-registration
+      objectset.rio.cattle.io/owner-gvk: helm.cattle.io/v1, Kind=HelmChart
+      objectset.rio.cattle.io/owner-name: traefik-crd
+      objectset.rio.cattle.io/owner-namespace: kube-system
+    creationTimestamp: "2025-12-08T04:31:30Z"
+    generation: 1
+    labels:
+      helmcharts.helm.cattle.io/chart: traefik-crd
+      objectset.rio.cattle.io/hash: 48ff3d5c3117b372fcdca509795f9f2702af0592
+    name: helm-install-traefik-crd
+    namespace: kube-system
+    ownerReferences:
+    - apiVersion: helm.cattle.io/v1
+      blockOwnerDeletion: false
+      controller: false
+      kind: HelmChart
+      name: traefik-crd
+      uid: 4625035a-56f2-404e-a096-706a492b7537
+    resourceVersion: "690"
+    uid: 008fb685-fc57-45d4-8377-ede161f568b1
+  spec:
+    backoffLimit: 1000
+    completionMode: NonIndexed
+    completions: 1
+    manualSelector: false
+    parallelism: 1
+    podReplacementPolicy: TerminatingOrFailed
+    selector:
+      matchLabels:
+        batch.kubernetes.io/controller-uid: 008fb685-fc57-45d4-8377-ede161f568b1
+    suspend: false
+    template:
+      metadata:
+        annotations:
+          helmcharts.helm.cattle.io/configHash: SHA256=E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855
+        creationTimestamp: null
+        labels:
+          batch.kubernetes.io/controller-uid: 008fb685-fc57-45d4-8377-ede161f568b1
+          batch.kubernetes.io/job-name: helm-install-traefik-crd
+          controller-uid: 008fb685-fc57-45d4-8377-ede161f568b1
+          helmcharts.helm.cattle.io/chart: traefik-crd
+          job-name: helm-install-traefik-crd
+      spec:
+        containers:
+        - args:
+          - install
+          env:
+          - name: NAME
+            value: traefik-crd
+          - name: VERSION
+          - name: REPO
+          - name: HELM_DRIVER
+            value: secret
+          - name: CHART_NAMESPACE
+            value: kube-system
+          - name: CHART
+            value: https://%{KUBERNETES_API}%/static/charts/traefik-crd-34.2.1+up34.2.0.tgz
+          - name: HELM_VERSION
+          - name: TARGET_NAMESPACE
+            value: kube-system
+          - name: AUTH_PASS_CREDENTIALS
+            value: "false"
+          - name: INSECURE_SKIP_TLS_VERIFY
+            value: "false"
+          - name: PLAIN_HTTP
+            value: "false"
+          - name: NO_PROXY
+            value: .svc,.cluster.local,10.42.0.0/16,10.43.0.0/16
+          - name: FAILURE_POLICY
+            value: reinstall
+          image: rancher/klipper-helm:v0.9.8-build20250709
+          imagePullPolicy: IfNotPresent
+          name: helm
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            readOnlyRootFilesystem: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /home/klipper-helm/.helm
+            name: klipper-helm
+          - mountPath: /home/klipper-helm/.cache
+            name: klipper-cache
+          - mountPath: /home/klipper-helm/.config
+            name: klipper-config
+          - mountPath: /tmp
+            name: tmp
+          - mountPath: /config
+            name: values
+          - mountPath: /chart
+            name: content
+        dnsPolicy: ClusterFirst
+        nodeSelector:
+          kubernetes.io/os: linux
+        restartPolicy: OnFailure
+        schedulerName: default-scheduler
+        securityContext:
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+        serviceAccount: helm-traefik-crd
+        serviceAccountName: helm-traefik-crd
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir:
+            medium: Memory
+          name: klipper-helm
+        - emptyDir:
+            medium: Memory
+          name: klipper-cache
+        - emptyDir:
+            medium: Memory
+          name: klipper-config
+        - emptyDir:
+            medium: Memory
+          name: tmp
+        - name: values
+          projected:
+            defaultMode: 420
+            sources:
+            - secret:
+                name: chart-values-traefik-crd
+        - configMap:
+            defaultMode: 420
+            name: chart-content-traefik-crd
+          name: content
+  status:
+    completionTime: "2025-12-08T04:31:47Z"
+    conditions:
+    - lastProbeTime: "2025-12-08T04:31:47Z"
+      lastTransitionTime: "2025-12-08T04:31:47Z"
+      message: Reached expected number of succeeded pods
+      reason: CompletionsReached
+      status: "True"
+      type: SuccessCriteriaMet
+    - lastProbeTime: "2025-12-08T04:31:47Z"
+      lastTransitionTime: "2025-12-08T04:31:47Z"
+      message: Reached expected number of succeeded pods
+      reason: CompletionsReached
+      status: "True"
+      type: Complete
+    ready: 0
+    startTime: "2025-12-08T04:31:32Z"
+    succeeded: 1
+    terminating: 0
+    uncountedTerminatedPods: {}
+kind: List
+metadata:
+  resourceVersion: ""

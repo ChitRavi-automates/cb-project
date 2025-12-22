@@ -1,0 +1,24 @@
+- name: Ensure k3s service is active on this worker (try k3s-agent or k3s)
+  block:
+    - name: Start and enable k3s-agent if present, otherwise start and enable k3s
+      shell: |
+        if systemctl list-unit-files --type=service --no-pager | grep -q '^k3s-agent.service'; then
+          systemctl daemon-reload
+          systemctl enable --now k3s-agent
+        elif systemctl list-unit-files --type=service --no-pager | grep -q '^k3s.service'; then
+          systemctl daemon-reload
+          systemctl enable --now k3s
+        else
+          echo "no k3s unit file found" >&2
+          exit 2
+        fi
+  rescue:
+    - name: Show k3s unit files and recent logs for debugging
+      shell: |
+        ls -l /etc/systemd/system | grep k3s || true
+        systemctl --no-pager status k3s || true
+        systemctl --no-pager status k3s-agent || true
+        journalctl -u k3s -n 200 --no-pager || journalctl -u k3s-agent -n 200 --no-pager || true
+      register: k3s_debug
+    - debug:
+        var: k3s_debug.stdout_lines
