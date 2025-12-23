@@ -36,3 +36,17 @@ kubeconfig.bak
 *.log
 *.bak
 iac-backups/
+# Terraform state & backups
+IaC/terraform.tfstate
+IaC/terraform.tfstate.*
+IaC/tfplan*
+IaC/tfstate.backup*
+# kube configs
+.kube/
+kubeconfig
+gha-kubeconfig
+gha-kubeconfig.base64
+# temp and backups
+*.log
+*.bak
+iac-backups/
