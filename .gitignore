@@ -50,3 +50,24 @@ gha-kubeconfig.base64
 *.log
 *.bak
 iac-backups/
+# Terraform state & backups
+IaC/terraform.tfstate
+IaC/terraform.tfstate.*
+IaC/tfplan*
+IaC/tfstate.backup*
+IaC/*.backup
+IaC/*.tfstate
+IaC/*.tfstate.*
+IaC/tfplan*
+# kubeconfigs and local kube backups
+kubeconfig
+kubeconfig.bak
+IaC/kubeconfigs/
+.kube/
+# iac backup files
+iac-backups/
+k3s-backup/
+# editor/temp
+*.log
+*.bak
+*~
