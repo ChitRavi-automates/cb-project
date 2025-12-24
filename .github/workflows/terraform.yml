@@ -1,0 +1,42 @@
+name: Terraform
+
+on:
+  pull_request:
+    paths:
+      - 'IaC/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'IaC/**'
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: IaC
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: '1.6.0'
+    - name: Terraform init
+      env:
+        HCLOUD_TOKEN: ${{ secrets.HETZNER_TOKEN }}
+      run: terraform init -input=false
+    - name: Terraform fmt
+      run: terraform fmt -check || true
+    - name: Terraform validate
+      run: terraform validate || true
+    - name: Terraform plan
+      if: github.event_name == 'pull_request'
+      env:
+        HCLOUD_TOKEN: ${{ secrets.HETZNER_TOKEN }}
+      run: terraform plan -no-color
+    - name: Terraform apply
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      env:
+        HCLOUD_TOKEN: ${{ secrets.HETZNER_TOKEN }}
+      run: terraform apply -auto-approve -no-color
