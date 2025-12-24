@@ -1,17 +1,15 @@
-name: Terraform
+name: Terraform Apply (manual)
 
 on:
-  pull_request:
-    paths:
-      - 'IaC/**'
-  push:
-    branches:
-      - main
-    paths:
-      - 'IaC/**'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment or workspace name'
+        required: false
+        default: 'default'
 
 jobs:
-  terraform:
+  apply:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -29,14 +27,7 @@ jobs:
         HCLOUD_TOKEN: ${{ secrets.HETZNER_TOKEN }}
       run: terraform init -input=false
 
-    - name: Terraform fmt
-      run: terraform fmt -check || true
-
-    - name: Terraform validate
-      run: terraform validate || true
-
-    - name: Terraform plan
-      if: github.event_name == 'pull_request' || github.event_name == 'push'
+    - name: Terraform apply (manual)
       env:
         HCLOUD_TOKEN: ${{ secrets.HETZNER_TOKEN }}
-      run: terraform plan -no-color
+      run: terraform apply -auto-approve -no-color
