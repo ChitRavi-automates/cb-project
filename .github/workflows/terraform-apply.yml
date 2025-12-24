@@ -1,0 +1,33 @@
+name: Terraform Apply (manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment or workspace name'
+        required: false
+        default: 'default'
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: IaC
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: '1.6.0'
+
+    - name: Terraform init
+      env:
+        HCLOUD_TOKEN: ${{ secrets.HETZNER_TOKEN }}
+      run: terraform init -input=false
+
+    - name: Terraform apply (manual)
+      env:
+        HCLOUD_TOKEN: ${{ secrets.HETZNER_TOKEN }}
+      run: terraform apply -auto-approve -no-color

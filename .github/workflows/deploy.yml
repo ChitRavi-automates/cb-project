@@ -1,0 +1,37 @@
+name: Deploy to cluster
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'k8s/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'v1.28.0'
+    - name: Decode KUBECONFIG and deploy
+      env:
+        KUBE_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+      run: |
+        echo "$KUBE_DATA" | base64 -d > ./gha-kubeconfig
+        export KUBECONFIG=$PWD/gha-kubeconfig
+        kubectl get namespaces
+        if [ -d "./k8s" ]; then
+          kubectl apply -R -f k8s/
+        else
+          echo "No k8s/ directory found; add manifests"
+        fi
+    - name: Example: use Technitium token and NS_DOMAIN
+      env:
+        TECH: ${{ secrets.TECHNITIUM_TOKEN }}
+        NS_DOMAIN: ${{ secrets.NS_DOMAIN }}
+      run: |
+        echo "NS_DOMAIN=${NS_DOMAIN}"
+        echo "TECH token length: ${#TECH}"
