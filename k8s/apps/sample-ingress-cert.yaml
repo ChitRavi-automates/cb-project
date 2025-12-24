@@ -7,7 +7,7 @@ metadata:
     kubernetes.io/ingress.class: traefik
 spec:
   rules:
-  - host: sample.chitra.doe24.chas-lab.dev  # replace or patch after pushing for real host
+  - host: chitra.doe24.chas-lab.dev  # replace or patch after pushing for real host
     http:
       paths:
       - path: /
@@ -26,7 +26,7 @@ metadata:
 spec:
   secretName: sample-nginx-tls
   dnsNames:
-  - sample.chitra.doe24.chas-lab.dev   # replace with actual host you control
+  - chitra.doe24.chas-lab.dev   # replace with actual host you control
   issuerRef:
     name: letsencrypt-staging
     kind: ClusterIssuer
