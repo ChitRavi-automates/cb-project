@@ -1,0 +1,32 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sample-nginx-ingress
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+  - host: sample.${{NS_DOMAIN:-example.test}}  # replace or patch after pushing for real host
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: sample-nginx
+            port:
+              number: 80
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: sample-nginx-cert
+  namespace: default
+spec:
+  secretName: sample-nginx-tls
+  dnsNames:
+  - sample.${{NS_DOMAIN:-example.test}}   # replace with actual host you control
+  issuerRef:
+    name: letsencrypt-staging
+    kind: ClusterIssuer
