@@ -71,3 +71,12 @@ k3s-backup/
 *.log
 *.bak
 *~
+
+# Kubeconfig backups
+kubeconfig.MIXED.backup
+kubeconfig.OLD.backup
+kubeconfig.bak
+kubeconfig.fresh
+
+# ArgoCD backups
+argocd-netpol-backup.yaml
