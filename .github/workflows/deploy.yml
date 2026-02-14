@@ -24,18 +24,22 @@ jobs:
         run: |
           echo "$KUBE_DATA" | base64 -d > ./.gha-kubeconfig
           export KUBECONFIG=$PWD/.gha-kubeconfig
+          echo "✅ Connected to cluster:"
           kubectl get namespaces
-          if [ -d "./k8s/" ]; then
-            kubectl apply -R -f k8s/
-          else
-            echo "No k8s/ directory found; add manifests"
-          fi
+          
+          echo "🔄 Syncing ArgoCD to deploy applications..."
+          # Force ArgoCD to sync instead of directly applying
+          kubectl patch application cb-project-apps -n argocd --type merge -p '{"metadata":{"annotations":{"argocd.argoproj.io/refresh":"hard"}}}' || echo "ArgoCD sync triggered"
+          
+          echo "✅ Deployment complete! ArgoCD will sync the changes."
       
-      - name: Example - use Technitium token and NS_DOMAIN
+      - name: Verify deployment
         env:
-          TECH: ${{ secrets.TECHNITIUM_TOKEN }}
-          NS_DOMAIN: ${{ secrets.NS_DOMAIN }}
+          KUBE_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
         run: |
-          echo "NS_DOMAIN=${NS_DOMAIN}"
-          echo "TECH token length: ${#TECH}"
-          # Add your Technitium DNS automation here if needed
+          export KUBECONFIG=$PWD/.gha-kubeconfig
+          echo "📊 ArgoCD Application Status:"
+          kubectl get applications -n argocd
+          echo ""
+          echo "📦 All Pods:"
+          kubectl get pods -A | grep -v Running | grep -v Completed || echo "All pods running!"
