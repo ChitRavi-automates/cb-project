@@ -1,13 +1,13 @@
-{{- if .Values.database.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "plan-it.fullname" . }}-database
+  namespace: {{ .Values.global.namespace }}
   labels:
     {{- include "plan-it.labels" . | nindent 4 }}
     component: database
 spec:
-  replicas: {{ .Values.database.replicaCount | default 1 }}
+  replicas: {{ .Values.database.replicaCount }}
   selector:
     matchLabels:
       {{- include "plan-it.selectorLabels" . | nindent 6 }}
@@ -18,78 +18,27 @@ spec:
         {{- include "plan-it.selectorLabels" . | nindent 8 }}
         component: database
     spec:
-      # Ensure the mounted volume is group-owned so the mssql user can access it
-      securityContext:
-        fsGroup: 10001
-
-      # initContainer tries to chown the mount so SQL Server can open files
-      initContainers:
-        - name: chown-data
-          image: busybox:1.36
-          command:
-            - sh
-            - -c
-            - chown -R 10001:0 /var/opt/mssql || true
-          volumeMounts:
-            - name: sqlserver-data
-              mountPath: /var/opt/mssql
-
       containers:
         - name: sqlserver
-          image: "{{ .Values.database.image.full }}"
+          image: "{{ .Values.database.image.repository }}:{{ .Values.database.image.tag }}"
           imagePullPolicy: {{ .Values.database.image.pullPolicy }}
+          ports:
+            - name: mssql
+              containerPort: {{ .Values.database.service.targetPort }}
+              protocol: TCP
           env:
             - name: ACCEPT_EULA
-              value: "Y"
-{{- if .Values.database.auth.secretName }}
-            - name: SA_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.database.auth.secretName | quote }}
-                  key: "SA_PASSWORD"
-{{- else if .Values.database.auth.saPassword }}
+              value: {{ .Values.database.env.ACCEPT_EULA | quote }}
             - name: SA_PASSWORD
               value: {{ .Values.database.auth.saPassword | quote }}
-{{- end }}
             - name: MSSQL_PID
               value: "Express"
-          ports:
-            - name: sqlserver
-              containerPort: 1433
-              protocol: TCP
+          volumeMounts:
+            - name: mssql-data
+              mountPath: /var/opt/mssql
           resources:
             {{- toYaml .Values.database.resources | nindent 12 }}
-          volumeMounts:
-            - name: sqlserver-data
-              mountPath: /var/opt/mssql
-          livenessProbe:
-            tcpSocket:
-              port: 1433
-            initialDelaySeconds: 30
-            periodSeconds: 10
-          readinessProbe:
-            tcpSocket:
-              port: 1433
-            initialDelaySeconds: 5
-            periodSeconds: 5
       volumes:
-        - name: sqlserver-data
-          {{- if .Values.database.persistence.enabled }}
+        - name: mssql-data
           persistentVolumeClaim:
             claimName: {{ include "plan-it.fullname" . }}-database-pvc
-          {{- else }}
-          emptyDir: {}
-          {{- end }}
-      {{- with .Values.database.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.database.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.database.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-{{- end }}
