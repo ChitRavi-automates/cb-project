@@ -17,8 +17,8 @@ frontend:
   enabled: true
   replicaCount: 1
   image:
-    repository: "registry.chas-lab.dev/chas-challenge-2025/group-13/plan-it/react"
-    tag: "latest"
+    repository: "nginx"
+    tag: "alpine"
     pullPolicy: IfNotPresent
   service:
     name: "chitra-plan-it-frontend"
@@ -37,8 +37,8 @@ backend:
   enabled: true
   replicaCount: 1
   image:
-    repository: "registry.chas-lab.dev/chas-challenge-2025/group-13/plan-it/dotnet"
-    tag: "latest"
+    repository: "httpd"
+    tag: "alpine"
     pullPolicy: IfNotPresent
   service:
     name: "chitra-plan-it-backend"
