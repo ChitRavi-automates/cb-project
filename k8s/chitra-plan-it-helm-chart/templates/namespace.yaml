@@ -1,0 +1,9 @@
+{{- if not .Values.global.namespace }} # if namespace is not set, create a new namespace
+apiVersion: v1 
+kind: Namespace # create a new namespace
+metadata: # metadata for the namespace 
+  name: {{ .Release.Namespace }} # name of the namespace  
+  labels: # labels for the namespace
+    {{- include "plan-it.labels" . | nindent 4 }}
+    name: {{ .Release.Namespace }} # name of the namespace
+{{- end }} # end if namespace is not set

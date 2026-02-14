@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: chitra-plan-it
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/ChitRavi-automates/cb-project
+    targetRevision: main
+    path: k8s/chitra-plan-it-helm-chart
+    helm:
+      valueFiles:
+        - values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: chitra-plan-it
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

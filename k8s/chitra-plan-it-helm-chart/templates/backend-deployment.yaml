@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "plan-it.fullname" . }}-backend
+  labels:
+    {{- include "plan-it.labels" . | nindent 4 }}
+    component: backend
+spec:
+  replicas: {{ .Values.backend.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "plan-it.selectorLabels" . | nindent 6 }}
+      component: backend
+  template:
+    metadata:
+      labels:
+        {{- include "plan-it.selectorLabels" . | nindent 8 }}
+        component: backend
+    spec:
+      containers:
+        - name: backend
+          image: {{ default (printf "%s:%s" .Values.backend.image.repository .Values.backend.image.tag) .Values.backend.image.full | quote }}
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.backend.service.targetPort }}
+              protocol: TCP
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: {{ .Values.app.environment | quote }}
+            - name: ConnectionStrings__DefaultConnection
+              value: {{ printf "Data Source=%s-database;Initial Catalog=%s;User ID=%s;Password=%s;Encrypt=True;TrustServerCertificate=True;" (include "plan-it.fullname" .) .Values.database.auth.database .Values.database.auth.username .Values.database.auth.saPassword | quote }}
+            - name: Issuer
+              value: {{ .Values.security.jwt.issuer | quote }}
+            - name: Audience
+              value: {{ .Values.security.jwt.audience | quote }}
+            - name: Key
+              value: {{ .Values.security.jwt.key | quote }}
+            - name: DISABLE_EXTERNAL_API
+              value: {{ default false .Values.database.disableExternalApi | quote }}
+          resources:
+            {{- toYaml .Values.backend.resources | nindent 12 }}
+      {{- with .Values.backend.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.backend.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.backend.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

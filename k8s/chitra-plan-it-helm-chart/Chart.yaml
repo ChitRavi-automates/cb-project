@@ -1,0 +1,19 @@
+apiVersion: v2 
+name: plan-it
+description: A Helm chart for plan-it - Schedular 
+type: application 
+version: 1.0.0 
+appVersion: "1.0.0" 
+keywords: 
+  - plan-board
+  - developer-platform
+  - .net
+  - react
+  - sql-server
+home: https://git.chas-lab.dev/chas-challenge-2025/group13/cc.13 
+sources: 
+  - https://git.chas-lab.dev/chas-challenge-2025/group13/cc.13 
+maintainers: 
+  - name: chitra.balasubramanian 
+    email: chitra.balasubramanian@chasacademy.se 
+dependencies: []

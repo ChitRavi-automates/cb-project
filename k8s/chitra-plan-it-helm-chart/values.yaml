@@ -1,0 +1,104 @@
+global:
+  imageRegistry: ""    
+  namespace: "chitra-plan-it"
+  domain: "chitra-plan-it.chitra.doe24.chas-lab.dev"
+
+app:
+  name: "chitra-plan-it"
+  environment: "production"
+
+security:
+  jwt:
+    issuer: "chitra-plan-it"
+    audience: "plan-it-users"
+    key: "SuperSecureJWTKey12345!ChangeMeInProduction"
+
+frontend:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: "registry.chas-lab.dev/chas-challenge-2025/group-13/plan-it/react"
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    name: "chitra-plan-it-frontend"
+    port: 80
+    targetPort: 80
+    type: ClusterIP
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "200m"
+      memory: "256Mi"
+
+backend:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: "registry.chas-lab.dev/chas-challenge-2025/group-13/plan-it/dotnet"
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    name: "chitra-plan-it-backend"
+    port: 80
+    targetPort: 80
+    type: ClusterIP
+  env:
+    ASPNETCORE_ENVIRONMENT: "Production"
+    ASPNETCORE_URLS: "http://+:80"
+  resources:
+    requests:
+      cpu: "150m"
+      memory: "256Mi"
+    limits:
+      cpu: "300m"
+      memory: "512Mi"
+
+database:
+  enabled: true
+  replicaCount: 1
+  type: "sqlserver"
+  image:
+    repository: "mcr.microsoft.com/mssql/server"
+    tag: "2022-latest"
+    pullPolicy: IfNotPresent
+  service:
+    name: "chitra-plan-it-database"
+    port: 1433
+    targetPort: 1433
+    type: ClusterIP
+  persistence:
+    enabled: true
+    size: 2Gi
+    storageClass: "local-path"
+  auth:
+    username: "sa"
+    saPassword: "PlAn@iT!521SecurePassword"
+    database: "PlanItDb"
+    secretName: "chitra-plan-it-database-secret"
+  env:
+    ACCEPT_EULA: "Y"
+
+imagePullSecrets: []
+
+ingress:
+  enabled: true
+  className: "traefik"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-production"
+  hosts:
+    - host: "chitra-plan-it.chitra.doe24.chas-lab.dev"
+      paths:
+        - path: "/"
+          pathType: Prefix
+          service: "chitra-plan-it-frontend"
+          servicePort: 80
+  tls:
+    - secretName: "chitra-plan-it-tls"
+      hosts:
+        - "chitra-plan-it.chitra.doe24.chas-lab.dev"
+
+cicd:
+  deployOnPush: true

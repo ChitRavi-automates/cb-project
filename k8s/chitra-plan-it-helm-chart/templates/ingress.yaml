@@ -1,0 +1,57 @@
+{{- /*
+Safe ingress template for plan-it
+- Uses only standard Helm/Sprig functions (hasKey, default, quote, trim, trimSuffix)
+- Tests presence of keys with hasKey and avoids numeric/string comparisons
+- Prefers explicit per-path service name/port when provided; otherwise computes a deterministic name and uses service port fallbacks
+- Uses toYaml | nindent for annotations/tls
+*/ -}}
+{{- if .Values.ingress.enabled }}
+{{- $root := . }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "plan-it.fullname" $root }}
+  labels:
+{{ include "plan-it.labels" $root | nindent 4 }}
+{{- with $root.Values.ingress.annotations }}
+  annotations:
+{{ toYaml . | nindent 4 }}
+{{- end }}
+spec:
+{{- if $root.Values.ingress.className }}
+  ingressClassName: {{ $root.Values.ingress.className | quote }}
+{{- end }}
+{{- if $root.Values.ingress.tls }}
+  tls:
+{{ toYaml $root.Values.ingress.tls | nindent 4 }}
+{{- end }}
+  rules:
+{{- range $host := $root.Values.ingress.hosts }}
+  - host: {{ $host.host | quote }}
+    http:
+      paths:
+{{- range $p := $host.paths }}
+      - path: {{ default "/" $p.path | quote }}
+        pathType: {{ default "Prefix" $p.pathType | quote }}
+        backend:
+          service:
+            name: {{/* prefer explicit non-empty service; else compute fullname-frontend/backend */ -}}
+              {{- if and (hasKey $p "service") (ne (trim (printf "%v" $p.service)) "") -}}
+{{ $p.service | quote }}
+              {{- else if eq (default "/" $p.path) "/" -}}
+{{ printf "%s-frontend" (include "plan-it.fullname" $root) | trimSuffix "-" | quote }}
+              {{- else -}}
+{{ printf "%s-backend" (include "plan-it.fullname" $root) | trimSuffix "-" | quote }}
+              {{- end }}
+            port:
+              number: {{/* priority: explicit path.servicePort -> frontend.service.port (for "/") -> backend.service.port -> default 80 */ -}}
+                {{- if hasKey $p "servicePort" -}}
+{{ $p.servicePort }}
+                {{- else if eq (default "/" $p.path) "/" -}}
+{{ default 80 $root.Values.frontend.service.port }}
+                {{- else -}}
+{{ default 80 $root.Values.backend.service.port }}
+                {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

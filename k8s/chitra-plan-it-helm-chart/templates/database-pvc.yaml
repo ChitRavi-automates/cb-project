@@ -1,0 +1,19 @@
+{{- if and .Values.database.enabled .Values.database.persistence.enabled }} # if database+persistence enabled, create a persistent volume claim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "plan-it.fullname" . }}-database-pvc # name of the persistent volume claim
+  labels:
+    {{- include "plan-it.labels" . | nindent 4 }} # labels for the persistent volume claim
+    component: database
+spec: # specification for the persistent volume claim
+  accessModes: 
+    - ReadWriteOnce  # only one node can r/w to persistent volume claim at a time for data consistency
+  resources:
+    requests: # requests for the persistent volume claim
+      storage: {{ .Values.database.persistence.size }}
+  {{- if .Values.database.persistence.storageClass }} # if storage class is set, use it
+  storageClassName: {{ .Values.database.persistence.storageClass }}
+  {{- end }} # end if storage class is set
+{{- end }} # end if database+persistence enabled
+
