@@ -102,3 +102,18 @@ ingress:
 
 cicd:
   deployOnPush: true
+
+ingress:
+  enabled: true
+  className: "traefik"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-production"
+  hosts:
+    - host: "chitra-plan-it.chitra.doe24.chas-lab.dev"
+      paths:
+        - path: "/"
+          pathType: Prefix
+  tls:
+    - secretName: "chitra-plan-it-tls"
+      hosts:
+        - "chitra-plan-it.chitra.doe24.chas-lab.dev"
