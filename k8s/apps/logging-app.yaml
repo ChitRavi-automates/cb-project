@@ -6,15 +6,12 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://grafana.github.io/helm-charts
-    chart: loki-stack
-    targetRevision: 2.10.3
+    repoURL: https://github.com/ChitRavi-automates/cb-project
+    targetRevision: main
+    path: k8s/logging-helm-chart
     helm:
-      values: |
-        loki:
-          enabled: true
-        promtail:
-          enabled: true
+      valueFiles:
+        - values.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: logging
@@ -22,3 +19,5 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

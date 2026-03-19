@@ -29,13 +29,19 @@ spec:
             - name: ASPNETCORE_ENVIRONMENT
               value: {{ .Values.app.environment | quote }}
             - name: ConnectionStrings__DefaultConnection
-              value: {{ printf "Data Source=%s-database;Initial Catalog=%s;User ID=%s;Password=%s;Encrypt=True;TrustServerCertificate=True;" (include "plan-it.fullname" .) .Values.database.auth.database .Values.database.auth.username .Values.database.auth.saPassword | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: chitra-plan-it-app-secrets
+                  key: connectionString
             - name: Issuer
               value: {{ .Values.security.jwt.issuer | quote }}
             - name: Audience
               value: {{ .Values.security.jwt.audience | quote }}
             - name: Key
-              value: {{ .Values.security.jwt.key | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: chitra-plan-it-app-secrets
+                  key: jwtKey
             - name: DISABLE_EXTERNAL_API
               value: {{ default false .Values.database.disableExternalApi | quote }}
           resources:

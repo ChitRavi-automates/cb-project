@@ -1,0 +1,9 @@
+apiVersion: v2
+name: monitoring
+description: kube-prometheus-stack with Prometheus, AlertManager (Gmail) and Grafana
+type: application
+version: 1.0.0
+dependencies:
+  - name: kube-prometheus-stack
+    version: 81.4.2
+    repository: https://prometheus-community.github.io/helm-charts

@@ -1,5 +1,5 @@
 global:
-  imageRegistry: ""    
+  imageRegistry: ""
   namespace: "chitra-plan-it"
   domain: "chitra-plan-it.chitra.doe24.chas-lab.dev"
 
@@ -11,7 +11,7 @@ security:
   jwt:
     issuer: "chitra-plan-it"
     audience: "plan-it-users"
-    key: "SuperSecureJWTKey12345!ChangeMeInProduction"
+    # key is stored in sealed secret: chitra-plan-it-app-secrets
 
 frontend:
   enabled: true
@@ -75,9 +75,9 @@ database:
     storageClass: "local-path"
   auth:
     username: "sa"
-    saPassword: "PlAn@iT!521SecurePassword"
     database: "PlanItDb"
-    secretName: "chitra-plan-it-database-secret"
+    # saPassword is stored in sealed secret: chitra-plan-it-app-secrets
+    secretName: "chitra-plan-it-app-secrets"
   env:
     ACCEPT_EULA: "Y"
 
@@ -87,33 +87,17 @@ ingress:
   enabled: true
   className: "traefik"
   annotations:
-    cert-manager.io/cluster-issuer: "letsencrypt-production"
+    kubernetes.io/ingress.class: "traefik"
+    cert-manager.io/cluster-issuer: "letsencrypt-wildcard"
   hosts:
     - host: "chitra-plan-it.chitra.doe24.chas-lab.dev"
       paths:
         - path: "/"
           pathType: Prefix
-          service: "chitra-plan-it-frontend"
-          servicePort: 80
   tls:
-    - secretName: "chitra-plan-it-tls"
+    - secretName: "chitra-plan-it-wildcard-tls"
       hosts:
-        - "chitra-plan-it.chitra.doe24.chas-lab.dev"
+        - "*.chitra.doe24.chas-lab.dev"
 
 cicd:
   deployOnPush: true
-
-ingress:
-  enabled: true
-  className: "traefik"
-  annotations:
-    cert-manager.io/cluster-issuer: "letsencrypt-production"
-  hosts:
-    - host: "chitra-plan-it.chitra.doe24.chas-lab.dev"
-      paths:
-        - path: "/"
-          pathType: Prefix
-  tls:
-    - secretName: "chitra-plan-it-tls"
-      hosts:
-        - "chitra-plan-it.chitra.doe24.chas-lab.dev"

@@ -1,0 +1,9 @@
+apiVersion: v2
+name: sealed-secrets
+description: Sealed Secrets controller for GitOps-safe secret management
+type: application
+version: 1.0.0
+dependencies:
+  - name: sealed-secrets
+    version: 2.16.1
+    repository: https://bitnami-labs.github.io/sealed-secrets

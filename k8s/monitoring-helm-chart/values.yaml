@@ -1,0 +1,65 @@
+kube-prometheus-stack:
+  grafana:
+    enabled: true
+    ingress:
+      enabled: true
+      ingressClassName: traefik
+      annotations:
+        kubernetes.io/ingress.class: traefik
+        cert-manager.io/cluster-issuer: letsencrypt-wildcard
+      hosts:
+        - grafana.chitra.doe24.chas-lab.dev
+      tls:
+        - secretName: grafana-tls
+          hosts:
+            - "*.chitra.doe24.chas-lab.dev"
+
+  prometheus:
+    prometheusSpec:
+      retention: 15d
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            storageClassName: local-path
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 10Gi
+      resources:
+        requests:
+          cpu: 200m
+          memory: 512Mi
+        limits:
+          cpu: 1000m
+          memory: 2Gi
+
+  alertmanager:
+    alertmanagerSpec:
+      alertmanagerConfigSecret: alertmanager-gmail-config
+      resources:
+        requests:
+          cpu: 50m
+          memory: 128Mi
+        limits:
+          cpu: 200m
+          memory: 256Mi
+
+  # k3s does not expose these endpoints
+  kubeControllerManager:
+    enabled: false
+  kubeScheduler:
+    enabled: false
+  kubeEtcd:
+    enabled: false
+  kubeProxy:
+    enabled: false
+
+  defaultRules:
+    rules:
+      etcd: false
+      kubeScheduler: false
+
+  # Run node-exporter on all nodes including control-plane
+  prometheus-node-exporter:
+    tolerations:
+      - operator: Exists
