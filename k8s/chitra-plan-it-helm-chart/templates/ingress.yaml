@@ -7,13 +7,18 @@ metadata:
   labels:
     {{- include "plan-it.labels" . | nindent 4 }}
   annotations:
-    kubernetes.io/ingress.class: traefik
-    cert-manager.io/cluster-issuer: letsencrypt-production
+    {{- range $key, $value := .Values.ingress.annotations }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
 spec:
   tls:
+    {{- range .Values.ingress.tls }}
     - hosts:
-        - {{ (index .Values.ingress.hosts 0).host }}
-      secretName: {{ include "plan-it.fullname" . }}-tls
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
   rules:
     {{- range .Values.ingress.hosts }}
     - host: {{ .host | quote }}
