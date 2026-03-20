@@ -17,6 +17,10 @@ spec:
         {{- include "plan-it.selectorLabels" . | nindent 8 }}
         component: frontend
     spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: frontend
           image: {{ default (printf "%s:%s" .Values.frontend.image.repository .Values.frontend.image.tag) .Values.frontend.image.full | quote }}

@@ -17,9 +17,9 @@ frontend:
   enabled: true
   replicaCount: 1
   image:
-    repository: "nginx"
-    tag: "alpine"
-    pullPolicy: IfNotPresent
+    repository: "registry.chasacademy.dev/chas-challenge-2025/group-13/plan-it/react"
+    tag: "latest"
+    pullPolicy: Always
   service:
     name: "chitra-plan-it-frontend"
     port: 80
@@ -37,9 +37,9 @@ backend:
   enabled: true
   replicaCount: 1
   image:
-    repository: "httpd"
-    tag: "alpine"
-    pullPolicy: IfNotPresent
+    repository: "registry.chasacademy.dev/chas-challenge-2025/group-13/plan-it/dotnet"
+    tag: "latest"
+    pullPolicy: Always
   service:
     name: "chitra-plan-it-backend"
     port: 80
@@ -81,7 +81,8 @@ database:
   env:
     ACCEPT_EULA: "Y"
 
-imagePullSecrets: []
+imagePullSecrets:
+  - name: registry-chasacademy
 
 ingress:
   enabled: true
