@@ -7,4 +7,6 @@ expected_nodes: 4
 node_ready_retries: 20
 node_ready_delay: 15
 taint_control_nodes: true
+# cluster_init=true required for bootstrap node to start with --cluster-init (HA etcd)
+cluster_init: true
 # Add any other global variables here (e.g. monitoring/argocd versions)
