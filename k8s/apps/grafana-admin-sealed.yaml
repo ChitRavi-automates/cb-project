@@ -1,0 +1,27 @@
+# This file must be regenerated with kubeseal using the cluster's sealing key.
+# To create/update:
+#   kubectl create secret generic grafana-admin-secret \
+#     --namespace monitoring \
+#     --from-literal=admin-user=admin \
+#     --from-literal=admin-password='<your-strong-password>' \
+#     --dry-run=client -o yaml | \
+#   kubeseal --controller-namespace kube-system \
+#            --controller-name sealed-secrets-controller \
+#            --format yaml > k8s/apps/grafana-admin-sealed.yaml
+#
+# Then commit the sealed file. Never commit the plain Secret.
+#
+# PLACEHOLDER — replace the encryptedData below after running kubeseal:
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: grafana-admin-secret
+  namespace: monitoring
+spec:
+  encryptedData:
+    admin-user: REPLACE_WITH_KUBESEAL_OUTPUT
+    admin-password: REPLACE_WITH_KUBESEAL_OUTPUT
+  template:
+    metadata:
+      name: grafana-admin-secret
+      namespace: monitoring

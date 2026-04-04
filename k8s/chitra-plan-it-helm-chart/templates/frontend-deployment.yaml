@@ -33,7 +33,7 @@ spec:
             - name: APP_ENV
               value: {{ .Values.app.environment | quote }}
             - name: REACT_APP_API_URL
-              value: {{ printf "http://%s:%d" (include "plan-it.fullname" .) (int .Values.backend.service.port) | quote }}
+              value: {{ printf "https://%s" .Values.global.domain | quote }}
           resources:
             {{- toYaml .Values.frontend.resources | nindent 12 }}
           livenessProbe:

@@ -100,8 +100,12 @@ ingress:
   hosts:
     - host: "chitra-plan-it.chitra.doe24.chas-lab.dev"
       paths:
+        - path: "/api"
+          pathType: Prefix
+          service: backend
         - path: "/"
           pathType: Prefix
+          service: frontend
   tls:
     - secretName: "chitra-plan-it-wildcard-tls"
       hosts:

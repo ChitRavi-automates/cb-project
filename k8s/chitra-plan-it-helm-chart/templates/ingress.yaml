@@ -29,9 +29,15 @@ spec:
             pathType: {{ .pathType }}
             backend:
               service:
+                {{- if eq (default "frontend" .service) "backend" }}
+                name: {{ include "plan-it.fullname" $ }}-backend
+                port:
+                  number: {{ $.Values.backend.service.port }}
+                {{- else }}
                 name: {{ include "plan-it.fullname" $ }}-frontend
                 port:
                   number: {{ $.Values.frontend.service.port }}
+                {{- end }}
           {{- end }}
     {{- end }}
 {{- end }}

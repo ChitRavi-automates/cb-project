@@ -44,7 +44,10 @@
     - name: Install k3s server on bootstrap if missing
       shell: >
         INSTALL_K3S_VERSION={{ k3s_version }}
-        curl -sfL https://get.k3s.io | sh -s - server {{ '--cluster-init' if cluster_init | default(false) else '' }} --node-name {{ inventory_hostname }}
+        curl -sfL https://get.k3s.io | sh -s - server
+        {{ '--cluster-init' if cluster_init | default(false) else '' }}
+        --node-name {{ inventory_hostname }}
+        {{ "--node-taint 'node-role.kubernetes.io/control-plane=:NoSchedule'" if taint_control_nodes | default(true) else '' }}
       args:
         creates: "{{ install_check_path }}"
 
@@ -103,7 +106,9 @@
       shell: >
         INSTALL_K3S_VERSION={{ k3s_version }}
         K3S_URL={{ k3s_url }} K3S_TOKEN={{ hostvars['bootstrap_vars'].k3s_token }}
-        curl -sfL https://get.k3s.io | sh -s - server --node-name {{ inventory_hostname }}
+        curl -sfL https://get.k3s.io | sh -s - server
+        --node-name {{ inventory_hostname }}
+        {{ "--node-taint 'node-role.kubernetes.io/control-plane=:NoSchedule'" if taint_control_nodes | default(true) else '' }}
       args:
         creates: "{{ install_check_path }}"
 

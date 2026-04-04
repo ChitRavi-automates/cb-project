@@ -1,6 +1,10 @@
 kube-prometheus-stack:
   grafana:
     enabled: true
+    admin:
+      existingSecret: grafana-admin-secret
+      userKey: admin-user
+      passwordKey: admin-password
     additionalDataSources:
       - name: Loki
         type: loki
