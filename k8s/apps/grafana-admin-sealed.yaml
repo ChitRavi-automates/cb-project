@@ -1,17 +1,4 @@
-# This file must be regenerated with kubeseal using the cluster's sealing key.
-# To create/update:
-#   kubectl create secret generic grafana-admin-secret \
-#     --namespace monitoring \
-#     --from-literal=admin-user=admin \
-#     --from-literal=admin-password='<your-strong-password>' \
-#     --dry-run=client -o yaml | \
-#   kubeseal --controller-namespace kube-system \
-#            --controller-name sealed-secrets-controller \
-#            --format yaml > k8s/apps/grafana-admin-sealed.yaml
-#
-# Then commit the sealed file. Never commit the plain Secret.
-#
-# PLACEHOLDER — replace the encryptedData below after running kubeseal:
+---
 apiVersion: bitnami.com/v1alpha1
 kind: SealedSecret
 metadata:
@@ -19,8 +6,8 @@ metadata:
   namespace: monitoring
 spec:
   encryptedData:
-    admin-user: REPLACE_WITH_KUBESEAL_OUTPUT
-    admin-password: REPLACE_WITH_KUBESEAL_OUTPUT
+    admin-password: AgAbQ6yPFtzunQIb2sewwhmQ8xKqqrCgZyLDhcRoIF9dHGfCg3LsxYT6yXqiLXLacHmb5qiFkz2uAGbBqQvdOfLWhljJJZwZLCpZ6G3uVo2miN6f36dO9vPn7BRVVTIlCF+FXjg1MBdll57Ob4KYW9HCJUvMvcG/1nMjrtB584sI0LdRoimtH0LuQVmX7yzM7mS6+5m1fbbXnKvzWbWwWbBIrIjY1RiZjkivR9ovgxgA4yS5sRED4BkiqOfYItMACX1n24P2W0bAB/yPNWSqUNY57tRtKfUPrWr4X8uomV5NhtKCBhyMTbDhl3j9eu6mNciEITIaNMseAG1jmgQkQnqrHj+7sZxw9QQ+gZGmudzR7W7vv1dZBjHYsi6ae7ohS7hjRDRKiEpQ7H2mQfp8iSXTsdhf+CFRtjB4BcGvMmtLTVAtmBqb3xqJm9VjfpNWUwfTMvwFrz/cBQgKwRztmXPE11CWNW8I+dbje7Ij1EFvg+qLw7wTulQIiKFJwBNewdZsGTIiRLY+WMYPmBjv2Dacis5+zUBeWyZWMp7TWJ5cwlwtFAmxN82AMeR5s4p0qv3Yhm0nEYCnMxqahoF2qHB7Kr8kd5h7AO/xERexlPkGv4F1FSYY4dh10678dGkOXszoq0XV4dnuG4Atc7N/OKvuDG4P0DR2vtL7iXC6qMyJtr5vPRt2IdxDkgoYK8qTavigPfEmDoFNZD+0MmE=
+    admin-user: AgCqBnqIC3NpzaeO6Nc+mnA+6LcZ3gGtpNxrOxoHW3apxkCPYfU7qMftD78lCJujCv2wcI56ZI0j6IbuVJo+PdmRQR5bu4TKRDX/JCJeLsBR+XKvWy0CIbUvvuCYRb6hmtlfMv0n5x1WVNQqd8mN+fwqVMttXfVG8IUMHQY7SXtVSWiTrzgVgUhm+Xc6OEdW6sw9p1jfQJe3HmXlBThPvbmzAtQHKI/qEdPgjzptvz7p9Wr0tQ4SkihobwyEs527pMd1JXc5XzxXWUnjV6PFnDZb4nNGzUJmqo0B6FeRUxS8ZQqNP6cNOkghbwPdW1I9C7IR6e+K67biJx5BzeGrjV7+ziwYrTNyy2QF2IPxuKvRz9kctpSDc7OICpHSQlWBnhAG5SilWZ5cFSB9i20JvHwGRDfL1+2AFPkkq5aPRE8jrg+c1AfZjqWK+bqbUGxXI+gwfKjdhjsCVC/5+FOVZ9WKk2TG5HsIH+V+bXC37QQM5TsP04wiK+hJiDdds8VKlcMraET6IrhevqAOjufLX7n1Npfyked5axZ3Io8mb/j0EkqkU5n/YWVA3vDRPoldZlcDFY4NxA4dOEm8dY0dPcf54YbrWeYqS5Q/M70aA0TPskaP+YkSjSvbrcpORMt5VJSN6wA//vM+eSdjJfhYDMVYINRJlw/MItKpI1YkjxfHdFy4IitocBAY4tPdR9NLhqWOPQkN9Q==
   template:
     metadata:
       name: grafana-admin-secret
