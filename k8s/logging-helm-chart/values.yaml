@@ -1,5 +1,22 @@
 loki-stack:
   loki:
     enabled: true
+    persistence:
+      enabled: true
+      storageClassName: local-path
+      size: 5Gi
+    config:
+      limits_config:
+        retention_period: 7d
+      table_manager:
+        retention_deletes_enabled: true
+        retention_period: 168h
+
   promtail:
     enabled: true
+
+  grafana:
+    enabled: false  # Grafana is managed by the monitoring stack
+    sidecar:
+      datasources:
+        enabled: true

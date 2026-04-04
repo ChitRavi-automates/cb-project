@@ -80,6 +80,13 @@ database:
     secretName: "chitra-plan-it-app-secrets"
   env:
     ACCEPT_EULA: "Y"
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "512Mi"
+    limits:
+      cpu: "1000m"
+      memory: "1Gi"
 
 imagePullSecrets:
   - name: registry-chasacademy
