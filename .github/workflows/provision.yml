@@ -2,12 +2,6 @@ name: Provision Infrastructure + Configure k3s
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - 'IaC/**'
-      - 'CMT/**'
 
 jobs:
   terraform:
