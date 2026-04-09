@@ -1,6 +1,6 @@
 # group_vars/all.yml - cluster variables
 k3s_version: "v1.33.5+k3s1"
-k3s_url: "https://157.90.231.202:6443"
+k3s_url: "https://PLACEHOLDER:6443"  # overwritten at runtime by provision.yml CI
 # leave k3s_token empty here; it will be read from the bootstrap at runtime or passed as extra-var
 k3s_token: ""
 expected_nodes: 4
