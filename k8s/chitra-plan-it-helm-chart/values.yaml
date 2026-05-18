@@ -17,7 +17,7 @@ frontend:
   enabled: true
   replicaCount: 1
   image:
-    repository: "registry.chasacademy.dev/chas-challenge-2025/group-13/plan-it/react"
+    repository: "ghcr.io/chitravi-automates/plan-it-frontend"
     tag: "latest"
     pullPolicy: Always
   service:
@@ -37,7 +37,7 @@ backend:
   enabled: true
   replicaCount: 1
   image:
-    repository: "registry.chasacademy.dev/chas-challenge-2025/group-13/plan-it/dotnet"
+    repository: "ghcr.io/chitravi-automates/plan-it-backend"
     tag: "latest"
     pullPolicy: Always
   service:
@@ -88,8 +88,7 @@ database:
       cpu: "1000m"
       memory: "1Gi"
 
-imagePullSecrets:
-  - name: registry-chasacademy
+imagePullSecrets: []
 
 ingress:
   enabled: true
