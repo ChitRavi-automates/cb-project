@@ -43,11 +43,11 @@ backend:
   service:
     name: "chitra-plan-it-backend"
     port: 80
-    targetPort: 80
+    targetPort: 8080
     type: ClusterIP
   env:
     ASPNETCORE_ENVIRONMENT: "Production"
-    ASPNETCORE_URLS: "http://+:80"
+    ASPNETCORE_URLS: "http://+:8080"
   resources:
     requests:
       cpu: "150m"
