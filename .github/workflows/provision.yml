@@ -2,6 +2,11 @@ name: Provision Infrastructure + Configure k3s
 
 on:
   workflow_dispatch:
+    inputs:
+      worker_ip:
+        description: 'Worker node IP (provided by teacher, leave empty to create via Terraform)'
+        required: false
+        default: ''
 
 jobs:
   terraform:
@@ -26,142 +31,10 @@ jobs:
           TFSTATE_DATA: ${{ secrets.TFSTATE_DATA }}
         run: |
           if [ -n "$TFSTATE_DATA" ]; then
-            echo "$TFSTATE_DATA" | base64 -d > IaC/terraform.tfstate
-            echo "State restored."
+            printf '%s' "$TFSTATE_DATA" | base64 -d > IaC/terraform.tfstate
+            echo "State restored. Size: $(wc -c < IaC/terraform.tfstate) bytes"
           else
             echo "No prior state — fresh provision."
           fi
 
-      - name: Terraform Init
-        run: terraform -chdir=IaC init
-
-      - name: Terraform Apply
-        env:
-          TF_VAR_hcloud_token: ${{ secrets.HETZNER_TOKEN }}
-          TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
-          TF_VAR_ssh_key_name: "cb-project-ci-key"
-          TF_VAR_use_existing_ssh_key: "false"
-          TF_VAR_k3s_token: ${{ secrets.K3S_TOKEN }}
-        run: terraform -chdir=IaC apply -auto-approve
-
-      - name: Extract outputs
-        id: outputs
-        run: |
-          CONTROL_IPS=$(terraform -chdir=IaC output -json control_public_ips)
-          WORKER_IPS=$(terraform -chdir=IaC output -json worker_public_ips)
-          INIT_IP=$(echo "$CONTROL_IPS" | jq -r '.[0]')
-          echo "control_init_ip=$INIT_IP" >> $GITHUB_OUTPUT
-          echo "control_ips_json=$CONTROL_IPS" >> $GITHUB_OUTPUT
-          echo "worker_ips_json=$WORKER_IPS" >> $GITHUB_OUTPUT
-          echo "Control init: $INIT_IP"
-
-      - name: Save Terraform state to secret
-        env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}
-        run: |
-          base64 -w0 IaC/terraform.tfstate | \
-            gh secret set TFSTATE_DATA --repo ${{ github.repository }}
-          echo "State saved."
-
-  ansible:
-    name: Ansible — Install and Join k3s
-    runs-on: ubuntu-latest
-    needs: terraform
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Ansible
-        run: pip install ansible --quiet
-
-      - name: Write SSH private key
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          echo "StrictHostKeyChecking no" >> ~/.ssh/config
-
-      - name: Wait for servers to be reachable
-        env:
-          INIT_IP: ${{ needs.terraform.outputs.control_init_ip }}
-        run: |
-          echo "Waiting for SSH on $INIT_IP..."
-          for i in $(seq 1 40); do
-            if ssh -i ~/.ssh/id_ed25519 -o ConnectTimeout=5 root@$INIT_IP echo ok 2>/dev/null; then
-              echo "Reachable."
-              break
-            fi
-            echo "  attempt $i/40 — retrying in 15s"
-            sleep 15
-          done
-
-      - name: Generate dynamic inventory
-        env:
-          INIT_IP: ${{ needs.terraform.outputs.control_init_ip }}
-          CONTROL_IPS: ${{ needs.terraform.outputs.control_ips_json }}
-          WORKER_IPS: ${{ needs.terraform.outputs.worker_ips_json }}
-        run: |
-          python3 - <<'EOF'
-          import json, os
-
-          init_ip     = os.environ["INIT_IP"]
-          control_ips = json.loads(os.environ["CONTROL_IPS"])  # [ip0, ip1, ip2]
-          worker_ips  = json.loads(os.environ["WORKER_IPS"])   # [ip0]
-
-          lines = ["[control_bootstrap]"]
-          lines.append(f"cb-project-control-0 ansible_host={init_ip}")
-
-          lines.append("\n[controls]")
-          for i, ip in enumerate(control_ips[1:], start=1):
-              lines.append(f"cb-project-control-{i} ansible_host={ip}")
-
-          lines.append("\n[workers]")
-          for i, ip in enumerate(worker_ips, start=1):
-              lines.append(f"cb-project-worker-{i} ansible_host={ip}")
-
-          lines.append("\n[all:vars]")
-          lines.append("ansible_user = root")
-          lines.append("ansible_ssh_private_key_file = ~/.ssh/id_ed25519")
-
-          with open("CMT/inventory.ini", "w") as f:
-              f.write("\n".join(lines) + "\n")
-
-          print("Generated inventory:")
-          print("\n".join(lines))
-          EOF
-
-      - name: Inject k3s_url into group_vars
-        env:
-          INIT_IP: ${{ needs.terraform.outputs.control_init_ip }}
-        run: |
-          sed -i "s|k3s_url:.*|k3s_url: \"https://${INIT_IP}:6443\"|" CMT/group_vars/all.yml
-          echo "group_vars/all.yml updated:"
-          grep k3s_url CMT/group_vars/all.yml
-
-      - name: Run Ansible
-        run: |
-          cd CMT
-          ansible-playbook site.yaml -v
-
-      - name: Extract kubeconfig and update secret
-        env:
-          INIT_IP: ${{ needs.terraform.outputs.control_init_ip }}
-          GH_TOKEN: ${{ secrets.GH_PAT }}
-        run: |
-          ssh -i ~/.ssh/id_ed25519 root@$INIT_IP \
-            "cat /etc/rancher/k3s/k3s.yaml" \
-            | sed "s/127.0.0.1/$INIT_IP/g" \
-            > /tmp/kubeconfig
-
-          base64 -w0 /tmp/kubeconfig | \
-            gh secret set KUBE_CONFIG_DATA --repo ${{ github.repository }}
-          echo "KUBE_CONFIG_DATA updated."
-
-      - name: Verify cluster
-        env:
-          INIT_IP: ${{ needs.terraform.outputs.control_init_ip }}
-        run: |
-          ssh -i ~/.ssh/id_ed25519 root@$INIT_IP \
-            "kubectl get nodes -o wide"
+      - name: Terraf
