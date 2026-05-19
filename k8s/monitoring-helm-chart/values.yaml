@@ -54,7 +54,7 @@ kube-prometheus-stack:
         smtp_smarthost: smtp.gmail.com:587
         smtp_from: chitra.inspires@gmail.com
         smtp_auth_username: chitra.inspires@gmail.com
-        smtp_auth_password_file: /etc/alertmanager/secrets/alertmanager-gmail-config/alertmanager.yaml
+        smtp_auth_password: ytjyfrfqhbydrdui
         smtp_require_tls: true
       route:
         group_by: [alertname, namespace]
