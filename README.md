@@ -1,4 +1,4 @@
-# CB Project — DevOps Exam
+# CB Project — DevOps 
 
 ![k3s](https://img.shields.io/badge/k3s-1.33-blue?logo=kubernetes)
 ![Terraform](https://img.shields.io/badge/Terraform-IaC-purple?logo=terraform)
