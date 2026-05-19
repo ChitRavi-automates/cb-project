@@ -1,4 +1,4 @@
-# CB Project — DevOps 
+# CB Project — DevOps Exam
 
 ![k3s](https://img.shields.io/badge/k3s-1.33-blue?logo=kubernetes)
 ![Terraform](https://img.shields.io/badge/Terraform-IaC-purple?logo=terraform)
@@ -10,9 +10,32 @@
 ![GitHub Actions](https://img.shields.io/badge/CI%2FCD-GitHub_Actions-black?logo=githubactions)
 ![Hetzner](https://img.shields.io/badge/Cloud-Hetzner-red?logo=hetzner)
 
+A production-grade DevOps platform built from scratch for the Chas Academy DevOps exam. Everything is automated — provision a fresh cluster, deploy all apps, configure monitoring, logging, and alerts with a single GitHub Actions workflow run.
+
+---
+
+## Architecture diagram
+
 ![Architecture](docs/architecture.svg)
 
-A production-grade DevOps platform built from scratch for the Chas Academy DevOps exam. Everything is automated — provision a fresh cluster, deploy all apps, configure monitoring, logging, and alerts with a single GitHub Actions workflow run.
+```mermaid
+graph TD
+    Dev[Developer] -->|git push| GH[GitHub repo]
+    GH -->|triggers| GA[GitHub Actions]
+    GA -->|Terraform + Ansible| HZ[Hetzner Cloud]
+    HZ --> K3S[k3s cluster 3 control + 1 worker]
+    GH -->|GitOps sync| ARGO[ArgoCD app-of-apps]
+    ARGO --> APP[App Helm chart React + .NET + SQL]
+    ARGO --> CERT[cert-manager Wildcard TLS]
+    ARGO --> MON[Prometheus + Grafana 220+ alert rules]
+    ARGO --> LOG[Loki + Promtail All pod logs]
+    ARGO --> SEC[Sealed Secrets]
+    ARGO --> TRK[Traefik Ingress]
+    MON --> ALERT[Alertmanager]
+    ALERT -->|SMTP| GMAIL[Gmail]
+    CERT -->|DNS-01| LE[LetsEncrypt + acme-dns]
+    APP -->|pull images| GHCR[ghcr.io]
+```
 
 ---
 
@@ -79,8 +102,9 @@ cb-project/
 │   └── deploy.yml       ← triggers ArgoCD sync on push
 ├── IaC/                 ← Terraform (Hetzner provider)
 ├── CMT/                 ← Ansible (k3s install + join)
+├── docs/                ← architecture diagram
 └── k8s/
-├── apps/            ← ArgoCD Application manifests + sealed secrets
+├── apps/                       ← ArgoCD Application manifests + sealed secrets
 ├── chitra-plan-it-helm-chart/  ← custom Helm chart (individual part)
 ├── cert-manager-helm-chart/
 ├── monitoring-helm-chart/
@@ -94,6 +118,19 @@ cb-project/
 |---|---|---|
 | `provision.yml` | Manual (`workflow_dispatch`) | Terraform → creates servers, Ansible → installs k3s, restores Sealed Secrets keypair, saves kubeconfig |
 | `deploy.yml` | Push to `k8s/**` | Syncs ArgoCD app → deploys latest changes |
+
+---
+
+## Exam day — how to re-provision from scratch
+
+1. Update `HETZNER_TOKEN` GitHub secret with new token
+2. Update `global.domain` in `values.yaml` with new domain
+3. Run `provision.yml` workflow — paste worker node IP if provided by teacher
+4. Re-register acme-dns for new domain, re-seal `acmedns-account-sealed.yaml`
+5. Push → ArgoCD syncs everything automatically
+6. Total time: ~15 minutes
+
+---
 
 ## Stack
 
@@ -119,26 +156,3 @@ cb-project/
 
 - Infrastructure + GitOps: https://github.com/ChitRavi-automates/cb-project
 - App source code: https://github.com/ChitRavi-automates/plan-it
-
-## Architecture diagram
-
-![Architecture](docs/architecture.svg)
-
-```mermaid
-graph TD
-    Dev[Developer] -->|git push| GH[GitHub repo]
-    GH -->|triggers| GA[GitHub Actions]
-    GA -->|Terraform + Ansible| HZ[Hetzner Cloud]
-    HZ --> K3S[k3s cluster\n3 control + 1 worker]
-    GH -->|GitOps sync| ARGO[ArgoCD\napp-of-apps]
-    ARGO --> APP[App Helm chart\nReact + .NET + SQL]
-    ARGO --> CERT[cert-manager\nWildcard TLS]
-    ARGO --> MON[Prometheus + Grafana\n220+ alert rules]
-    ARGO --> LOG[Loki + Promtail\nAll pod logs]
-    ARGO --> SEC[Sealed Secrets]
-    ARGO --> TRK[Traefik\nIngress]
-    MON --> ALERT[Alertmanager]
-    ALERT -->|SMTP| GMAIL[Gmail]
-    CERT -->|DNS-01| LE[LetsEncrypt + acme-dns]
-    APP -->|pull images| GHCR[ghcr.io]
-```
