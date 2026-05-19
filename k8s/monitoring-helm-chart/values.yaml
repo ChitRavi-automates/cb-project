@@ -29,7 +29,6 @@ kube-prometheus-stack:
         - secretName: grafana-tls
           hosts:
             - "*.chitra.doe24.chas-lab.dev"
-
   prometheus:
     prometheusSpec:
       retention: 15d
@@ -48,10 +47,41 @@ kube-prometheus-stack:
         limits:
           cpu: 1000m
           memory: 2Gi
-
   alertmanager:
+    config:
+      global:
+        resolve_timeout: 5m
+        smtp_smarthost: smtp.gmail.com:587
+        smtp_from: chitra.balasubramanian@chasacademy.se
+        smtp_auth_username: chitra.balasubramanian@chasacademy.se
+        smtp_auth_password_file: /etc/alertmanager/secrets/alertmanager-gmail-config/alertmanager.yaml
+        smtp_require_tls: true
+      route:
+        group_by: [alertname, namespace]
+        group_wait: 30s
+        group_interval: 5m
+        repeat_interval: 4h
+        receiver: gmail
+        routes:
+          - receiver: "null"
+            matchers:
+              - alertname = "Watchdog"
+      receivers:
+        - name: "null"
+        - name: gmail
+          email_configs:
+            - to: chitra.balasubramanian@chasacademy.se
+              send_resolved: true
+      inhibit_rules:
+        - source_matchers:
+            - severity = critical
+          target_matchers:
+            - severity =~ warning|info
+          equal: [namespace, alertname]
     alertmanagerSpec:
       alertmanagerConfigSecret: alertmanager-gmail-config
+      secrets:
+        - alertmanager-gmail-config
       resources:
         requests:
           cpu: 50m
@@ -59,8 +89,6 @@ kube-prometheus-stack:
         limits:
           cpu: 200m
           memory: 256Mi
-
-  # k3s does not expose these endpoints
   kubeControllerManager:
     enabled: false
   kubeScheduler:
@@ -69,13 +97,10 @@ kube-prometheus-stack:
     enabled: false
   kubeProxy:
     enabled: false
-
   defaultRules:
     rules:
       etcd: false
       kubeScheduler: false
-
-  # Run node-exporter on all nodes including control-plane
   prometheus-node-exporter:
     tolerations:
       - operator: Exists
