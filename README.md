@@ -10,6 +10,8 @@
 ![GitHub Actions](https://img.shields.io/badge/CI%2FCD-GitHub_Actions-black?logo=githubactions)
 ![Hetzner](https://img.shields.io/badge/Cloud-Hetzner-red?logo=hetzner)
 
+![Architecture](docs/architecture.svg)
+
 A production-grade DevOps platform built from scratch for the Chas Academy DevOps exam. Everything is automated — provision a fresh cluster, deploy all apps, configure monitoring, logging, and alerts with a single GitHub Actions workflow run.
 
 ---
@@ -117,3 +119,24 @@ cb-project/
 
 - Infrastructure + GitOps: https://github.com/ChitRavi-automates/cb-project
 - App source code: https://github.com/ChitRavi-automates/plan-it
+
+## Architecture diagram
+
+```mermaid
+graph TD
+    Dev[Developer] -->|git push| GH[GitHub repo]
+    GH -->|triggers| GA[GitHub Actions]
+    GA -->|Terraform + Ansible| HZ[Hetzner Cloud]
+    HZ --> K3S[k3s cluster\n3 control + 1 worker]
+    GH -->|GitOps sync| ARGO[ArgoCD\napp-of-apps]
+    ARGO --> APP[App Helm chart\nReact + .NET + SQL]
+    ARGO --> CERT[cert-manager\nWildcard TLS]
+    ARGO --> MON[Prometheus + Grafana\n220+ alert rules]
+    ARGO --> LOG[Loki + Promtail\nAll pod logs]
+    ARGO --> SEC[Sealed Secrets]
+    ARGO --> TRK[Traefik\nIngress]
+    MON --> ALERT[Alertmanager]
+    ALERT -->|SMTP| GMAIL[Gmail]
+    CERT -->|DNS-01| LE[LetsEncrypt + acme-dns]
+    APP -->|pull images| GHCR[ghcr.io]
+```
