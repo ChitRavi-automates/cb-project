@@ -52,8 +52,8 @@ kube-prometheus-stack:
       global:
         resolve_timeout: 5m
         smtp_smarthost: smtp.gmail.com:587
-        smtp_from: chitra.balasubramanian@chasacademy.se
-        smtp_auth_username: chitra.balasubramanian@chasacademy.se
+        smtp_from: chitra.inspires@gmail.com
+        smtp_auth_username: chitra.inspires@gmail.com
         smtp_auth_password_file: /etc/alertmanager/secrets/alertmanager-gmail-config/alertmanager.yaml
         smtp_require_tls: true
       route:
@@ -70,7 +70,7 @@ kube-prometheus-stack:
         - name: "null"
         - name: gmail
           email_configs:
-            - to: chitra.balasubramanian@chasacademy.se
+            - to: chitra.inspires@gmail.com
               send_resolved: true
       inhibit_rules:
         - source_matchers:
