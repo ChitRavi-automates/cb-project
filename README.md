@@ -53,9 +53,7 @@
 - Keypair backed up in GitHub secret `SEALED_SECRETS_KEYPAIR`
 - Auto-restored on fresh cluster via `provision.yml`
 
-## Exam Day Steps
-1. Update `HETZNER_TOKEN` GitHub secret with new token
-2. Update `global.domain` in `values.yaml` with new domain
+
 3. Run `provision.yml` workflow (paste worker IP if provided by teacher)
 4. Re-register acme-dns for new domain, re-seal `acmedns-account-sealed.yaml`
 5. Commit + push → `deploy.yml` triggers → ArgoCD syncs everything
