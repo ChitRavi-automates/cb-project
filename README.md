@@ -122,6 +122,8 @@ cb-project/
 
 ## Architecture diagram
 
+![Architecture](docs/architecture.svg)
+
 ```mermaid
 graph TD
     Dev[Developer] -->|git push| GH[GitHub repo]
