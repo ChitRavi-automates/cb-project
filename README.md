@@ -93,19 +93,6 @@ cb-project/
 | `provision.yml` | Manual (`workflow_dispatch`) | Terraform → creates servers, Ansible → installs k3s, restores Sealed Secrets keypair, saves kubeconfig |
 | `deploy.yml` | Push to `k8s/**` | Syncs ArgoCD app → deploys latest changes |
 
----
-
-## Exam day — how to re-provision from scratch
-
-1. Update `HETZNER_TOKEN` GitHub secret with new token
-2. Update `global.domain` in `values.yaml` with new domain
-3. Run `provision.yml` workflow — paste worker node IP if provided by teacher
-4. Re-register acme-dns for new domain, re-seal `acmedns-account-sealed.yaml`
-5. Push → ArgoCD syncs everything automatically
-6. Total time: ~15 minutes
-
----
-
 ## Stack
 
 | Category | Tools |
