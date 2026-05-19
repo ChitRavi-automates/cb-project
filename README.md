@@ -1,59 +1,132 @@
 # CB Project — DevOps Exam
 
-## Repository
-- **GitHub repo:** https://github.com/ChitRavi-automates/cb-project
-- **App source repo:** https://github.com/ChitRavi-automates/plan-it
+![k3s](https://img.shields.io/badge/k3s-1.33-blue?logo=kubernetes)
+![Terraform](https://img.shields.io/badge/Terraform-IaC-purple?logo=terraform)
+![ArgoCD](https://img.shields.io/badge/ArgoCD-GitOps-orange?logo=argo)
+![Helm](https://img.shields.io/badge/Helm-chart-blue?logo=helm)
+![Prometheus](https://img.shields.io/badge/Prometheus-monitoring-red?logo=prometheus)
+![Grafana](https://img.shields.io/badge/Grafana-dashboards-orange?logo=grafana)
+![Loki](https://img.shields.io/badge/Loki-logging-yellow?logo=grafana)
+![GitHub Actions](https://img.shields.io/badge/CI%2FCD-GitHub_Actions-black?logo=githubactions)
+![Hetzner](https://img.shields.io/badge/Cloud-Hetzner-red?logo=hetzner)
+
+A production-grade DevOps platform built from scratch for the Chas Academy DevOps exam. Everything is automated — provision a fresh cluster, deploy all apps, configure monitoring, logging, and alerts with a single GitHub Actions workflow run.
+
+---
 
 ## Live URLs
-- **Application:** https://chitra-plan-it.chitra.doe24.chas-lab.dev
-- **Grafana:** https://grafana.chitra.doe24.chas-lab.dev
-- **ArgoCD:** https://argocd.chitra.doe24.chas-lab.dev
 
-## Cluster
-- 3 control plane nodes (NoSchedule taint — no workloads)
-- 1 worker node (all workloads run here)
-- k3s v1.33.5
+| Service | URL |
+|---|---|
+| Application | https://chitra-plan-it.chitra.doe24.chas-lab.dev |
+| Grafana | https://grafana.chitra.doe24.chas-lab.dev |
+| ArgoCD | https://argocd.chitra.doe24.chas-lab.dev |
+
+---
+
+## Architecture
+
+### Cluster
+- 3 control plane nodes on Hetzner Cloud with `NoSchedule` taint (no workloads run on control plane)
+- 1 worker node — all workloads scheduled here
+- k3s v1.33 — lightweight Kubernetes
+
+### Infrastructure as Code
+- **Terraform** — provisions Hetzner servers, SSH keys, firewall rules
+- **Ansible** — installs and configures k3s on all nodes, joins worker to cluster
+- Worker node IP accepted as `workflow_dispatch` input — never hardcoded
+
+### GitOps
+- **ArgoCD** with app-of-apps pattern — all Kubernetes resources managed from Git
+- Auto sync + self-heal + prune enabled on all apps
+- Zero manual `kubectl apply` — everything flows from Git
+
+### App (Individual part)
+- Custom **Helm chart** — packages frontend (React), backend (.NET 8), database (SQL Server)
+- 8+ customizable values in `values.yaml`
+- Images hosted on `ghcr.io` (public)
+- Deployed via ArgoCD, triggered by GitHub Actions on push
+
+### Ingress + TLS
+- **Traefik** as ingress controller (built into k3s)
+- **cert-manager** with LetsEncrypt wildcard certificate via DNS-01 challenge (acme-dns)
+- All services accessible over HTTPS with valid TLS
+
+### Secrets
+- **Sealed Secrets** — all secrets encrypted and stored in Git
+- Cluster keypair backed up as GitHub secret — auto-restored on fresh cluster
+- No plaintext secrets anywhere in the repo
+
+### Monitoring
+- **kube-prometheus-stack** — Prometheus + Grafana + Alertmanager
+- 220+ alert rules out of the box
+- **Alertmanager** configured with Gmail receiver — alerts delivered via email
+- Custom alert rules in `monitoring-helm-chart/templates/alert-rules.yaml`
+
+### Logging
+- **Loki** — log storage and querying
+- **Promtail** — DaemonSet running on all 4 nodes, collects logs from every pod
+- Logs queryable in Grafana Explore with LogQL
+
+---
+
+## Repo structure
+cb-project/
+├── .github/workflows/
+│   ├── provision.yml    ← provisions cluster (Terraform + Ansible)
+│   └── deploy.yml       ← triggers ArgoCD sync on push
+├── IaC/                 ← Terraform (Hetzner provider)
+├── CMT/                 ← Ansible (k3s install + join)
+└── k8s/
+├── apps/            ← ArgoCD Application manifests + sealed secrets
+├── chitra-plan-it-helm-chart/  ← custom Helm chart (individual part)
+├── cert-manager-helm-chart/
+├── monitoring-helm-chart/
+├── logging-helm-chart/
+└── sealed-secrets-helm-chart/
+---
+
+## CI/CD workflows
+
+| Workflow | Trigger | What it does |
+|---|---|---|
+| `provision.yml` | Manual (`workflow_dispatch`) | Terraform → creates servers, Ansible → installs k3s, restores Sealed Secrets keypair, saves kubeconfig |
+| `deploy.yml` | Push to `k8s/**` | Syncs ArgoCD app → deploys latest changes |
+
+---
+
+## Exam day — how to re-provision from scratch
+
+1. Update `HETZNER_TOKEN` GitHub secret with new token
+2. Update `global.domain` in `values.yaml` with new domain
+3. Run `provision.yml` workflow — paste worker node IP if provided by teacher
+4. Re-register acme-dns for new domain, re-seal `acmedns-account-sealed.yaml`
+5. Push → ArgoCD syncs everything automatically
+6. Total time: ~15 minutes
+
+---
 
 ## Stack
-| Component | Tool |
+
+| Category | Tools |
 |---|---|
-| Infrastructure (IaC) | Terraform + Hetzner Cloud |
-| Configuration Management | Ansible |
-| GitOps | ArgoCD (app-of-apps pattern) |
-| Ingress | Traefik (built-in k3s) |
-| TLS | cert-manager + LetsEncrypt wildcard (DNS-01 via acme-dns) |
-| Monitoring | kube-prometheus-stack (Prometheus + Grafana + Alertmanager) |
-| Log collection | Loki + Promtail (DaemonSet on all nodes) |
+| Infrastructure | Terraform, Hetzner Cloud |
+| Configuration | Ansible |
+| Container orchestration | k3s, Docker |
+| GitOps | ArgoCD (app-of-apps) |
+| App packaging | Helm |
+| Ingress | Traefik |
+| TLS | cert-manager, LetsEncrypt (DNS-01) |
+| Monitoring | Prometheus, Grafana, Alertmanager |
+| Logging | Loki, Promtail |
 | Secrets | Sealed Secrets |
-| App packaging | Helm chart (individual) |
 | CI/CD | GitHub Actions |
-| Container registry | GitHub Container Registry (ghcr.io) |
+| Registry | GitHub Container Registry (ghcr.io) |
+| Alerts | Gmail via SMTP |
 
-## CI/CD Workflows
-| Workflow | Trigger | Purpose |
-|---|---|---|
-| `provision.yml` | Manual (`workflow_dispatch`) | Provision Hetzner servers + install k3s |
-| `deploy.yml` | Push to `k8s/**` on main | Trigger ArgoCD sync |
+---
 
-## Helm Chart (Individual Part)
-- **Chart:** `k8s/chitra-plan-it-helm-chart`
-- **Components:** Frontend (React), Backend (.NET), Database (SQL Server)
-- **Images:** `ghcr.io/chitravi-automates/plan-it-frontend:latest`, `ghcr.io/chitravi-automates/plan-it-backend:latest`
-- **Customizable values (5+):** `frontend.replicaCount`, `backend.replicaCount`, `frontend.image.tag`, `backend.image.tag`, `global.domain`, `database.persistence.size`, `database.persistence.storageClass`, `app.environment`
+## GitHub repos
 
-## Logging
-- Promtail runs as DaemonSet on all 4 nodes
-- Collects logs from all pods in all namespaces
-- Ships to Loki
-- Viewable in Grafana → Explore → Loki datasource
-
-## Secrets Handling
-- All secrets stored as Sealed Secrets in Git
-- Encrypted with cluster keypair
-- Keypair backed up in GitHub secret `SEALED_SECRETS_KEYPAIR`
-- Auto-restored on fresh cluster via `provision.yml`
-
-
-3. Run `provision.yml` workflow (paste worker IP if provided by teacher)
-4. Re-register acme-dns for new domain, re-seal `acmedns-account-sealed.yaml`
-5. Commit + push → `deploy.yml` triggers → ArgoCD syncs everything
+- Infrastructure + GitOps: https://github.com/ChitRavi-automates/cb-project
+- App source code: https://github.com/ChitRavi-automates/plan-it
