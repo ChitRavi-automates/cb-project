@@ -11,12 +11,13 @@ loki-stack:
       table_manager:
         retention_deletes_enabled: true
         retention_period: 168h
-
   promtail:
     enabled: true
-
+    config:
+      clients:
+        - url: http://logging-loki.logging.svc.cluster.local:3100/loki/api/v1/push
   grafana:
-    enabled: false  # Grafana is managed by the monitoring stack
+    enabled: false
     sidecar:
       datasources:
         enabled: true
