@@ -10,7 +10,7 @@
 ![GitHub Actions](https://img.shields.io/badge/CI%2FCD-GitHub_Actions-black?logo=githubactions)
 ![Hetzner](https://img.shields.io/badge/Cloud-Hetzner-red?logo=hetzner)
 
-A production-grade DevOps platform built from scratch for the Chas Academy DevOps exam. Everything is automated — provision a fresh cluster, deploy all apps, configure monitoring, logging, and alerts with a single GitHub Actions workflow run.
+A production-grade DevOps platform built from scratch for the DevOps exam. Everything is automated — provision a fresh cluster, deploy all apps, configure monitoring, logging, and alerts with a single GitHub Actions workflow run.
 
 ---
 
