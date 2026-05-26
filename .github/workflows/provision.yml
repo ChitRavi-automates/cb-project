@@ -63,7 +63,7 @@ jobs:
 
       - name: Save Terraform state to secret
         env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}
+          GH_TOKEN: ${{ secrets.CB_PROJECT_PAT }}
         run: |
           printf '%s' "$(base64 -w0 IaC/terraform.tfstate)" | \
             gh secret set TFSTATE_DATA --repo ${{ github.repository }}
@@ -173,7 +173,7 @@ jobs:
       - name: Extract kubeconfig and update secret
         env:
           INIT_IP: ${{ needs.terraform.outputs.control_init_ip }}
-          GH_TOKEN: ${{ secrets.GH_PAT }}
+          GH_TOKEN: ${{ secrets.CB_PROJECT_PAT }}
         run: |
           ssh -i ~/.ssh/id_ed25519 root@$INIT_IP \
             "cat /etc/rancher/k3s/k3s.yaml" \
